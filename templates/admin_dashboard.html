@@ -9,15 +9,12 @@
             <p class="text-gray-500 mt-1">Manage users, courses, and school operations</p>
         </div>
         <div class="flex items-center gap-4">
-            <a href="/admin/export_users" class="bg-gray-100 text-gray-700 px-4 py-3 rounded-2xl font-bold hover:bg-gray-200 transition">
-                Export CSV
+            <a href="/admin/teacher_attendance" class="bg-indigo-50 text-indigo-700 px-4 py-3 rounded-2xl font-bold hover:bg-indigo-100 transition">
+                Staff Attendance
             </a>
-            <form action="/admin/import_users" method="POST" enctype="multipart/form-data" class="flex gap-2">
-                <input type="file" name="file" id="csv-file" class="hidden" onchange="this.form.submit()">
-                <button type="button" onclick="document.getElementById('csv-file').click()" class="bg-indigo-50 text-primary px-4 py-3 rounded-2xl font-bold hover:bg-indigo-100 transition">
-                    Import Users
-                </button>
-            </form>
+            <a href="/admin/backup" class="bg-amber-50 text-amber-700 px-4 py-3 rounded-2xl font-bold hover:bg-amber-100 transition">
+                Export Backup
+            </a>
             <button onclick="document.getElementById('notice-modal').classList.remove('hidden')" class="bg-accent text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
                 Post Notice
             </button>
@@ -83,9 +80,55 @@
             </div>
 
             <!-- Stats Chart (Placeholder for now) -->
-            <div class="bg-white p-8 rounded-3xl shadow-card">
-                <h3 class="text-xl font-bold mb-6">School Growth</h3>
-                <canvas id="growthChart" class="h-64"></canvas>
+            </div>
+
+            <!-- Management Tables -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
+                <!-- User List -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                    <h3 class="text-xl font-bold mb-6">User Accounts</h3>
+                    <div class="overflow-y-auto max-h-96 pr-2 custom-scrollbar">
+                        <table class="w-full text-left">
+                            <tbody class="divide-y divide-gray-50">
+                                {% for u in users %}
+                                <tr class="group hover:bg-gray-50 transition">
+                                    <td class="py-4">
+                                        <p class="font-bold text-gray-800 leading-none">{{ u.name }}</p>
+                                        <p class="text-[9px] uppercase font-black text-gray-400 mt-1">{{ u.role }}</p>
+                                    </td>
+                                    <td class="py-4 text-right space-x-3">
+                                        <button onclick="openEditUser('{{ u.id }}', '{{ u.name }}', '{{ u.email }}', '{{ u.role }}')" class="text-indigo-400 hover:text-indigo-600 transition font-bold text-[10px] uppercase">Edit</button>
+                                        <a href="/admin/delete_user/{{ u.id }}" class="text-red-400 hover:text-red-600 transition font-bold text-[10px] uppercase" onclick="return confirm('Delete user?')">Remove</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Course List -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                    <h3 class="text-xl font-bold mb-6">Active Courses</h3>
+                    <div class="overflow-y-auto max-h-96 pr-2 custom-scrollbar">
+                        <table class="w-full text-left">
+                            <tbody class="divide-y divide-gray-50">
+                                {% for c in courses %}
+                                <tr class="group hover:bg-gray-50 transition">
+                                    <td class="py-4">
+                                        <p class="font-bold text-gray-800 leading-none">{{ c.title }}</p>
+                                        <p class="text-[9px] uppercase font-black text-gray-400 mt-1">{{ c.teacher_ref.name if c.teacher_id else "Unassigned" }}</p>
+                                    </td>
+                                    <td class="py-4 text-right space-x-3">
+                                        <button onclick="openEditCourse('{{ c.id }}', '{{ c.title }}', '{{ c.description }}')" class="text-indigo-400 hover:text-indigo-600 transition font-bold text-[10px] uppercase">Edit</button>
+                                        <a href="/admin/delete_course/{{ c.id }}" class="text-red-400 hover:text-red-600 transition font-bold text-[10px] uppercase" onclick="return confirm('Delete course?')">Remove</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -122,6 +165,9 @@
                             <p class="text-sm font-bold text-gray-800">{{ event.title }}</p>
                             <span class="text-[10px] font-bold text-gray-400 uppercase">{{ event.type }}</span>
                         </div>
+                        <a href="/admin/delete_event/{{ event.id }}" class="ml-auto text-red-300 hover:text-red-500 transition" onclick="return confirm('Delete event?')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </a>
                     </div>
                     {% else %}
                     <p class="text-gray-400 text-sm text-center py-6">No upcoming events</p>
@@ -195,5 +241,55 @@
             scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
         }
     });
+</script>
+<!-- Edit Modals -->
+<div id="edit-user-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
+        <h3 class="text-2xl font-black mb-8">Edit User</h3>
+        <form id="edit-user-form" action="" method="POST" class="space-y-4">
+            <input type="text" name="name" id="edit-user-name" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+            <input type="email" name="email" id="edit-user-email" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+            <select name="role" id="edit-user-role" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary">
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="parent">Parent</option>
+                <option value="admin">Admin</option>
+            </select>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold">Cancel</button>
+                <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold shadow-lg">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="edit-course-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
+        <h3 class="text-2xl font-black mb-8">Edit Course</h3>
+        <form id="edit-course-form" action="" method="POST" class="space-y-4">
+            <input type="text" name="title" id="edit-course-title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+            <textarea name="description" id="edit-course-desc" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-32" required></textarea>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('edit-course-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold">Cancel</button>
+                <button type="submit" class="flex-1 bg-secondary text-white py-4 rounded-2xl font-bold shadow-lg">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditUser(id, name, email, role) {
+        document.getElementById('edit-user-form').action = '/admin/edit_user/' + id;
+        document.getElementById('edit-user-name').value = name;
+        document.getElementById('edit-user-email').value = email;
+        document.getElementById('edit-user-role').value = role;
+        document.getElementById('edit-user-modal').classList.remove('hidden');
+    }
+    function openEditCourse(id, title, desc) {
+        document.getElementById('edit-course-form').action = '/admin/edit_course/' + id;
+        document.getElementById('edit-course-title').value = title;
+        document.getElementById('edit-course-desc').value = desc;
+        document.getElementById('edit-course-modal').classList.remove('hidden');
+    }
 </script>
 {% endblock %}

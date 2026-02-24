@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-10">
+    <header class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-3xl font-black text-gray-900">Staff Attendance</h1>
+            <p class="text-gray-500 mt-1">Track and manage teacher daily presence</p>
+        </div>
+        <a href="/admin" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-bold hover:bg-gray-200 transition">Back to Dashboard</a>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- Mark Attendance -->
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+            <h3 class="text-xl font-bold mb-6 text-gray-800">Record Today's Presence</h3>
+            <form action="/admin/teacher_attendance" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-gray-400 uppercase mb-2">Select Teacher</label>
+                    <select name="teacher_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-gray-400 uppercase mb-2">Status</label>
+                    <select name="status" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Leave">On Leave</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg hover:opacity-90 transition">Save Attendance</button>
+            </form>
+        </div>
+
+        <!-- Attendance Logs -->
+        <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] shadow-card">
+            <h3 class="text-xl font-bold mb-6 text-gray-800">Recent Logs</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-gray-400 text-[10px] uppercase font-black tracking-widest border-b border-gray-100">
+                            <th class="pb-4">Staff Member</th>
+                            <th class="pb-4">Date</th>
+                            <th class="pb-4 text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for record in attendance %}
+                        <tr>
+                            <td class="py-4">
+                                <span class="font-bold text-gray-900">{{ record.teacher_ref.name if record.teacher_ref else "Unknown" }}</span>
+                            </td>
+                            <td class="py-4 text-sm text-gray-500">{{ record.date.strftime('%d %B, %Y') }}</td>
+                            <td class="py-4 text-right">
+                                <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase 
+                                    {% if record.status == 'Present' %}bg-green-100 text-green-600
+                                    {% elif record.status == 'Absent' %}bg-red-100 text-red-600
+                                    {% else %}bg-amber-100 text-amber-600{% endif %}">
+                                    {{ record.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

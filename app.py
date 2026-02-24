@@ -6,7 +6,9 @@ from functools import wraps
 from datetime import datetime
 import csv
 import io
-from flask import Response
+import json
+import os
+from flask import Response, send_file
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -340,6 +342,113 @@ def mark_attendance(course_id):
     db.session.add(att)
     db.session.commit()
     return redirect(url_for("teacher_dashboard"))
+
+@app.route("/admin/teacher_attendance", methods=["GET", "POST"])
+@role_required(["admin"])
+def manage_teacher_attendance():
+    if request.method == "POST":
+        att = TeacherAttendance(teacher_id=request.form["teacher_id"], status=request.form["status"])
+        db.session.add(att)
+        db.session.commit()
+        log_activity(session["user_id"], "Recorded teacher attendance")
+        return redirect(url_for("manage_teacher_attendance"))
+    teachers = User.query.filter_by(role="teacher").all()
+    attendance = TeacherAttendance.query.order_by(TeacherAttendance.date.desc()).all()
+    return render_template("admin_teacher_attendance.html", teachers=teachers, attendance=attendance)
+
+# --- CRUD EDIT/DELETE ---
+@app.route("/admin/delete_user/<int:user_id>")
+@role_required(["admin"])
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        name = user.name
+        db.session.delete(user)
+        db.session.commit()
+        log_activity(session["user_id"], f"Deleted user: {name}")
+    return redirect(url_for("admin"))
+
+@app.route("/admin/edit_user/<int:user_id>", methods=["POST"])
+@role_required(["admin"])
+def edit_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        user.name = request.form["name"]
+        user.email = request.form["email"]
+        user.role = request.form["role"]
+        db.session.commit()
+        log_activity(session["user_id"], f"Edited user: {user.name}")
+    return redirect(url_for("admin"))
+
+@app.route("/admin/edit_course/<int:course_id>", methods=["POST"])
+@role_required(["admin"])
+def edit_course(course_id):
+    course = Course.query.get(course_id)
+    if course:
+        course.title = request.form["title"]
+        course.description = request.form["description"]
+        db.session.commit()
+        log_activity(session["user_id"], f"Edited course: {course.title}")
+    return redirect(url_for("admin"))
+
+@app.route("/admin/edit_fee/<int:fee_id>", methods=["POST"])
+@role_required(["admin"])
+def edit_fee(fee_id):
+    fee = Fee.query.get(fee_id)
+    if fee:
+        fee.title = request.form["title"]
+        fee.amount = request.form["amount"]
+        db.session.commit()
+        log_activity(session["user_id"], f"Edited fee: {fee.title}")
+    return redirect(url_for("manage_fees"))
+
+@app.route("/admin/delete_course/<int:course_id>")
+@role_required(["admin"])
+def delete_course(course_id):
+    course = Course.query.get(course_id)
+    if course:
+        title = course.title
+        db.session.delete(course)
+        db.session.commit()
+        log_activity(session["user_id"], f"Deleted course: {title}")
+    return redirect(url_for("admin"))
+
+@app.route("/admin/delete_fee/<int:fee_id>")
+@role_required(["admin"])
+def delete_fee(fee_id):
+    fee = Fee.query.get(fee_id)
+    if fee:
+        title = fee.title
+        db.session.delete(fee)
+        db.session.commit()
+        log_activity(session["user_id"], f"Deleted fee: {title}")
+    return redirect(url_for("manage_fees"))
+
+@app.route("/admin/delete_event/<int:event_id>")
+@role_required(["admin"])
+def delete_event(event_id):
+    event = Event.query.get(event_id)
+    if event:
+        title = event.title
+        db.session.delete(event)
+        db.session.commit()
+        log_activity(session["user_id"], f"Deleted event: {title}")
+    return redirect(url_for("admin"))
+
+# --- BACKUP ---
+@app.route("/admin/backup")
+@role_required(["admin"])
+def backup_db():
+    users = [{"name": u.name, "email": u.email, "role": u.role} for u in User.query.all()]
+    courses = [{"title": c.title, "desc": c.description} for c in Course.query.all()]
+    data = {"users": users, "courses": courses, "timestamp": str(datetime.utcnow())}
+    
+    backup_file = "backup.json"
+    with open(backup_file, "w") as f:
+        json.dump(data, f)
+    
+    log_activity(session["user_id"], "Generated system backup")
+    return send_file(backup_file, as_attachment=True)
 
 # --- REPORTING ---
 @app.route("/report/result/<int:student_id>")
