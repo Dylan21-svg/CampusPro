@@ -1,0 +1,140 @@
+{% extends "base.html" %} {% block content %}
+<div class="flex h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <div class="w-64 bg-white p-6 shadow-lg">
+    <h1 class="text-2xl font-bold text-primary mb-10">Admin Portal</h1>
+    <nav class="space-y-4">
+      <a href="/admin" class="block font-semibold text-primary">Dashboard</a>
+      <a href="/logout" class="block text-gray-500 hover:text-red-500"
+        >Logout</a
+      >
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 p-10 overflow-y-auto">
+    <header class="flex justify-between items-center mb-10">
+      <h2 class="text-3xl font-bold">School Overview</h2>
+      <div class="flex items-center gap-4">
+        <span
+          class="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium"
+          >Administrator</span
+        >
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <!-- Course Management -->
+      <section class="bg-white p-8 rounded-3xl shadow-card">
+        <h3 class="text-xl font-bold mb-6">Create New Course</h3>
+        <form action="/add_course" method="POST" class="space-y-4">
+          <input
+            type="text"
+            name="title"
+            placeholder="Course Title"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+            required
+          />
+          <textarea
+            name="description"
+            placeholder="Description"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+            required
+          ></textarea>
+          <select
+            name="teacher_id"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">Assign Teacher (Optional)</option>
+            {% for teacher in teachers %}
+            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+            {% endfor %}
+          </select>
+          <button
+            type="submit"
+            class="w-full bg-primary text-white py-4 rounded-xl font-bold hover:shadow-lg transition"
+          >
+            Add Course
+          </button>
+        </form>
+      </section>
+
+      <!-- User Management -->
+      <section class="bg-white p-8 rounded-3xl shadow-card">
+        <h3 class="text-xl font-bold mb-6">Add Teacher or Student</h3>
+        <form action="/add_user" method="POST" class="space-y-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+            required
+          />
+          <select
+            name="role"
+            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+          <button
+            type="submit"
+            class="w-full bg-secondary text-white py-4 rounded-xl font-bold hover:shadow-lg transition"
+          >
+            Create User
+          </button>
+        </form>
+      </section>
+    </div>
+
+    <!-- List Sections -->
+    <div class="mt-10 grid grid-cols-1 gap-10">
+      <div class="bg-white p-8 rounded-3xl shadow-card">
+        <h3 class="text-xl font-bold mb-6">All Courses</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-gray-400 text-sm uppercase">
+                <th class="pb-4">Title</th>
+                <th class="pb-4">Teacher</th>
+                <th class="pb-4">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              {% for course in courses %}
+              <tr>
+                <td class="py-4 font-semibold">{{ course.title }}</td>
+                <td class="py-4 text-gray-500">
+                  {{ course.teacher_ref.name if course.teacher_id else
+                  "Unassigned" }}
+                </td>
+                <td class="py-4">
+                  <span
+                    class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs"
+                    >Active</span
+                  >
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

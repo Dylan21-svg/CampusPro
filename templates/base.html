@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<script>
+
+tailwind.config = {
+
+theme: {
+
+extend: {
+
+fontFamily: {
+
+inter: ['Inter', 'sans-serif'],
+
+},
+
+colors: {
+
+primary: '#6366f1',
+
+secondary: '#8b5cf6',
+
+},
+
+boxShadow: {
+
+card: '0 10px 25px rgba(0,0,0,0.05)',
+
+cardHover: '0 20px 40px rgba(0,0,0,0.08)',
+
+}
+
+}
+
+}
+
+}
+
+</script>
+
+<style>
+
+body{
+
+font-family: 'Inter', sans-serif;
+
+background:#f8fafc;
+
+}
+
+</style>
+
+
+</head>
+
+
+<body>
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+
+</html>
