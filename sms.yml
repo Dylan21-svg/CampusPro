@@ -1,0 +1,22 @@
+ - name: Deploy to Render
+  # You may pin to the exact commit or the version.
+  # uses: JorgeLNJunior/render-deploy@32c271db15b8b87b91cec4bb2cc094cc7c0f98a2
+  uses: JorgeLNJunior/render-deploy@v1.5.0
+  with:
+    # Render service id
+    service_id: 
+    # Render api key
+    api_key: 
+    # Clear build cache
+    clear_cache: # optional, default is false
+    # Wait until the deploy status is successful
+    wait_deploy: # optional, default is false
+    # Creates a github deployment
+    github_deployment: # optional, default is false
+    # Github auth token
+    github_token: # optional
+    # The name of the GitHub deployment environment
+    deployment_environment: # optional, default is production
+    # Specify what git ref to deploy. If a branch, deploys the latest commit in this branch. If a tag, deploys the commit related to that tag.
+    ref: # optional
+          
