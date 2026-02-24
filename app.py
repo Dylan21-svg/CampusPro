@@ -19,18 +19,25 @@ def role_required(roles):
         def decorated_function(*args, **kwargs):
             if "user_id" not in session:
                 return redirect(url_for("login"))
-            if session.get("role") not in roles:
-                flash("You do not have permission to view this page.", "danger")
-                return redirect(url_for("dashboard"))
+            
+            # Verify user still exists in DB (handles DB resets)
+            user = User.query.get(session["user_id"])
+            if not user or user.role not in roles:
+                if not user: session.clear()
+                flash("Please login to continue.", "danger")
+                return redirect(url_for("login"))
+            
             return f(*args, **kwargs)
         return decorated_function
     return decorator
 
 # Activity Logger
 def log_activity(user_id, action):
-    log = ActivityLog(user_id=user_id, action=action)
-    db.session.add(log)
-    db.session.commit()
+    # Verify user exists before logging (avoids FK issues or orphans)
+    if User.query.get(user_id):
+        log = ActivityLog(user_id=user_id, action=action)
+        db.session.add(log)
+        db.session.commit()
 
 # Email Notification Stub
 def send_notification(user_id, subject, message):
@@ -100,8 +107,12 @@ def login():
 @app.route("/logout")
 def logout():
     if "user_id" in session:
-        log_activity(session["user_id"], "Logged out")
+        # Only log if user still exists
+        user = User.query.get(session["user_id"])
+        if user:
+            log_activity(user.id, "Logged out")
     session.clear()
+    flash("You have been logged out.", "info")
     return redirect(url_for("login"))
 
 # --- DASHBOARDS ---
