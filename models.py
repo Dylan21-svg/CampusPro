@@ -93,6 +93,13 @@ class Message(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.String(500))
+    date = db.Column(db.Date, nullable=False)
+    type = db.Column(db.String(50), default="Event") # Event, Holiday, Exam
     is_read = db.Column(db.Boolean, default=False)
 
 class ActivityLog(db.Model):

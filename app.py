@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from config import Config
-from models import db, User, Course, Enrollment, Attendance, Result, Fee, Payment, Timetable, Notice, Message, ActivityLog
+from models import db, User, Course, Enrollment, Attendance, Result, Fee, Payment, Timetable, Notice, Message, ActivityLog, Event
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -124,13 +124,14 @@ def dashboard():
     courses = [enrollment.course_ref for enrollment in enrollments]
     all_courses = Course.query.all()
     notices = Notice.query.filter(Notice.target_role.in_(["all", "student"])).order_by(Notice.date_posted.desc()).all()
+    events = Event.query.filter(Event.date >= datetime.utcnow().date()).order_by(Event.date.asc()).limit(5).all()
     
     # Simple attendance stats
     total_att = Attendance.query.filter_by(student_id=user.id).count()
     present_att = Attendance.query.filter_by(student_id=user.id, status="Present").count()
     attendance_data = [present_att, total_att - present_att] if total_att > 0 else [0, 0]
     
-    return render_template("dashboard.html", user=user, courses=courses, all_courses=all_courses, notices=notices, attendance_data=attendance_data)
+    return render_template("dashboard.html", user=user, courses=courses, all_courses=all_courses, notices=notices, events=events, attendance_data=attendance_data)
 
 @app.route("/teacher")
 @role_required(["teacher"])
@@ -157,11 +158,28 @@ def admin():
     teachers = User.query.filter_by(role="teacher").all()
     parents = User.query.filter_by(role="parent").all()
     logs = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(10).all()
+    events = Event.query.order_by(Event.date.asc()).all()
     
     # Enrollment growth over 4 weeks (mock logic based on date)
     growth_data = [5, 8, 12, Enrollment.query.count()] # Simplification
     
-    return render_template("admin_dashboard.html", courses=courses, users=users, teachers=teachers, parents=parents, logs=logs, growth_data=growth_data)
+    return render_template("admin_dashboard.html", courses=courses, users=users, teachers=teachers, parents=parents, logs=logs, growth_data=growth_data, events=events)
+
+@app.route("/admin/events", methods=["GET", "POST"])
+@role_required(["admin"])
+def manage_events():
+    if request.method == "POST":
+        event = Event(
+            title=request.form["title"],
+            description=request.form["description"],
+            date=datetime.strptime(request.form["date"], '%Y-%m-%d').date(),
+            type=request.form["type"]
+        )
+        db.session.add(event)
+        db.session.commit()
+        log_activity(session["user_id"], f"Added event: {event.title}")
+        return redirect(url_for("admin"))
+    return redirect(url_for("admin"))
 
 @app.route("/parent")
 @role_required(["parent"])
@@ -322,6 +340,30 @@ def mark_attendance(course_id):
     db.session.add(att)
     db.session.commit()
     return redirect(url_for("teacher_dashboard"))
+
+# --- REPORTING ---
+@app.route("/report/result/<int:student_id>")
+def student_report(student_id):
+    if "user_id" not in session: return redirect(url_for("login"))
+    # Auth: Allow student, parent, or admin
+    curr_user = User.query.get(session["user_id"])
+    if curr_user.role == "student" and curr_user.id != student_id:
+        return redirect(url_for("dashboard"))
+        
+    student = User.query.get(student_id)
+    results = Result.query.filter_by(student_id=student_id).all()
+    return render_template("report_result.html", student=student, results=results, date=datetime.utcnow())
+
+@app.route("/report/receipt/<int:payment_id>")
+def fee_receipt(payment_id):
+    if "user_id" not in session: return redirect(url_for("login"))
+    payment = Payment.query.get(payment_id)
+    # Auth: Allow payer, parent, or admin
+    curr_user = User.query.get(session["user_id"])
+    if curr_user.role == "student" and payment.student_id != curr_user.id:
+        return redirect(url_for("dashboard"))
+        
+    return render_template("report_receipt.html", payment=payment, date=datetime.utcnow())
 
 if __name__ == "__main__":
     with app.app_context():

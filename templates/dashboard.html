@@ -26,6 +26,9 @@
                     <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase backdrop-blur-md">V2 System Active</span>
                     <h2 class="text-4xl font-black mt-6 leading-tight">Your Semester<br>At a Glance</h2>
                     <p class="mt-4 opacity-80 max-w-xs font-medium">Continue your progress in {{ courses|length }} active courses.</p>
+                    <a href="/report/result/{{ user.id }}" target="_blank" class="inline-block mt-8 bg-white text-primary px-8 py-3 rounded-2xl font-black text-sm shadow-xl hover:-translate-y-1 transition duration-300">
+                        Print Transcript
+                    </a>
                 </div>
                 <!-- Decorative Circle -->
                 <div class="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition duration-700"></div>
@@ -95,6 +98,27 @@
                     </div>
                     {% else %}
                     <p class="text-center text-gray-400 text-xs py-10">No recent updates</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- School Events -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                <h3 class="text-xl font-bold mb-8">School Calendar</h3>
+                <div class="space-y-6">
+                    {% for event in events %}
+                    <div class="flex items-center gap-5">
+                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex flex-col items-center justify-center shadow-inner">
+                            <span class="text-[9px] uppercase font-black text-primary">{{ event.date.strftime('%b') }}</span>
+                            <span class="text-sm font-black text-gray-900">{{ event.date.strftime('%d') }}</span>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-900">{{ event.title }}</h4>
+                            <span class="text-[9px] font-black text-gray-300 uppercase">{{ event.type }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-gray-400 text-xs py-5">No upcoming events</p>
                     {% endfor %}
                 </div>
             </div>

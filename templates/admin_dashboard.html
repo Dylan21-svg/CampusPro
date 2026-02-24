@@ -21,6 +21,9 @@
             <button onclick="document.getElementById('notice-modal').classList.remove('hidden')" class="bg-accent text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
                 Post Notice
             </button>
+            <button onclick="document.getElementById('event-modal').classList.remove('hidden')" class="bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
+                Add Event
+            </button>
         </div>
     </header>
 
@@ -104,6 +107,27 @@
                     {% endfor %}
                 </div>
             </div>
+
+            <!-- School Events -->
+            <div class="bg-white p-8 rounded-3xl shadow-card mt-10">
+                <h3 class="text-xl font-bold mb-6">School Calendar</h3>
+                <div class="space-y-6">
+                    {% for event in events %}
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl">
+                        <div class="w-12 h-12 bg-white rounded-xl flex flex-col items-center justify-center shadow-sm">
+                            <span class="text-[10px] uppercase font-bold text-primary">{{ event.date.strftime('%b') }}</span>
+                            <span class="font-bold text-gray-900">{{ event.date.strftime('%d') }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">{{ event.title }}</p>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">{{ event.type }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-gray-400 text-sm text-center py-6">No upcoming events</p>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -123,6 +147,29 @@
             <div class="flex gap-4 pt-4">
                 <button type="button" onclick="document.getElementById('notice-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold transition">Cancel</button>
                 <button type="submit" class="flex-1 bg-accent text-white py-4 rounded-2xl font-bold shadow-lg transition">Post Notice</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Event Modal -->
+<div id="event-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
+        <h3 class="text-2xl font-black mb-8">Schedule School Event</h3>
+        <form action="/admin/events" method="POST" class="space-y-4">
+            <input type="text" name="title" placeholder="Event Title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+            <textarea name="description" placeholder="Description (Optional)" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-24"></textarea>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="date" name="date" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+                <select name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary">
+                    <option value="Event">Event</option>
+                    <option value="Holiday">Holiday</option>
+                    <option value="Exam">Exam Period</option>
+                </select>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('event-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold transition">Cancel</button>
+                <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold shadow-lg transition">Schedule</button>
             </div>
         </form>
     </div>
