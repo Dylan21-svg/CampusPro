@@ -1,140 +1,152 @@
-{% extends "base.html" %} {% block content %}
-<div class="flex h-screen bg-gray-50">
-  <!-- Sidebar -->
-  <div class="w-64 bg-white p-6 shadow-lg">
-    <h1 class="text-2xl font-bold text-primary mb-10">Admin Portal</h1>
-    <nav class="space-y-4">
-      <a href="/admin" class="block font-semibold text-primary">Dashboard</a>
-      <a href="/logout" class="block text-gray-500 hover:text-red-500"
-        >Logout</a
-      >
-    </nav>
-  </div>
+{% extends "base.html" %}
 
-  <!-- Main Content -->
-  <div class="flex-1 p-10 overflow-y-auto">
+{% block content %}
+<div class="p-10">
+    <!-- Header -->
     <header class="flex justify-between items-center mb-10">
-      <h2 class="text-3xl font-bold">School Overview</h2>
-      <div class="flex items-center gap-4">
-        <span
-          class="bg-primary/10 text-primary px-4 py-2 rounded-full font-medium"
-          >Administrator</span
-        >
-      </div>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Command Center</h1>
+            <p class="text-gray-500 mt-1">Manage users, courses, and school operations</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/admin/export_users" class="bg-gray-100 text-gray-700 px-4 py-3 rounded-2xl font-bold hover:bg-gray-200 transition">
+                Export CSV
+            </a>
+            <form action="/admin/import_users" method="POST" enctype="multipart/form-data" class="flex gap-2">
+                <input type="file" name="file" id="csv-file" class="hidden" onchange="this.form.submit()">
+                <button type="button" onclick="document.getElementById('csv-file').click()" class="bg-indigo-50 text-primary px-4 py-3 rounded-2xl font-bold hover:bg-indigo-100 transition">
+                    Import Users
+                </button>
+            </form>
+            <button onclick="document.getElementById('notice-modal').classList.remove('hidden')" class="bg-accent text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
+                Post Notice
+            </button>
+        </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <!-- Course Management -->
-      <section class="bg-white p-8 rounded-3xl shadow-card">
-        <h3 class="text-xl font-bold mb-6">Create New Course</h3>
-        <form action="/add_course" method="POST" class="space-y-4">
-          <input
-            type="text"
-            name="title"
-            placeholder="Course Title"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-            required
-          ></textarea>
-          <select
-            name="teacher_id"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">Assign Teacher (Optional)</option>
-            {% for teacher in teachers %}
-            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
-            {% endfor %}
-          </select>
-          <button
-            type="submit"
-            class="w-full bg-primary text-white py-4 rounded-xl font-bold hover:shadow-lg transition"
-          >
-            Add Course
-          </button>
-        </form>
-      </section>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- Quick Actions & Forms -->
+        <div class="lg:col-span-2 space-y-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- User Form -->
+                <section class="bg-white p-8 rounded-3xl shadow-card">
+                    <h3 class="text-xl font-bold mb-6">Register User</h3>
+                    <form action="/add_user" method="POST" class="space-y-4">
+                        <input type="text" name="name" placeholder="Full Name" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+                        <input type="email" name="email" placeholder="Email" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+                        <input type="password" name="password" placeholder="Password" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+                        <select id="role-select" name="role" onchange="toggleParentLink(this.value)" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary text-gray-500">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="parent">Parent</option>
+                        </select>
+                        
+                        <div id="parent-link-div" class="space-y-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase">Link Parent (For Students)</label>
+                            <select name="parent_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary text-gray-500">
+                                <option value="">No Parent Linked</option>
+                                {% for parent in parents %}
+                                <option value="{{ parent.id }}">{{ parent.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-      <!-- User Management -->
-      <section class="bg-white p-8 rounded-3xl shadow-card">
-        <h3 class="text-xl font-bold mb-6">Add Teacher or Student</h3>
-        <form action="/add_user" method="POST" class="space-y-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-            required
-          />
-          <select
-            name="role"
-            class="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-          </select>
-          <button
-            type="submit"
-            class="w-full bg-secondary text-white py-4 rounded-xl font-bold hover:shadow-lg transition"
-          >
-            Create User
-          </button>
-        </form>
-      </section>
-    </div>
+                        <script>
+                            function toggleParentLink(role) {
+                                const div = document.getElementById('parent-link-div');
+                                if (role === 'student') div.classList.remove('hidden');
+                                else div.classList.add('hidden');
+                            }
+                        </script>
+                        <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-bold hover:shadow-lg transition">Create Account</button>
+                    </form>
+                </section>
 
-    <!-- List Sections -->
-    <div class="mt-10 grid grid-cols-1 gap-10">
-      <div class="bg-white p-8 rounded-3xl shadow-card">
-        <h3 class="text-xl font-bold mb-6">All Courses</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left">
-            <thead>
-              <tr class="text-gray-400 text-sm uppercase">
-                <th class="pb-4">Title</th>
-                <th class="pb-4">Teacher</th>
-                <th class="pb-4">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              {% for course in courses %}
-              <tr>
-                <td class="py-4 font-semibold">{{ course.title }}</td>
-                <td class="py-4 text-gray-500">
-                  {{ course.teacher_ref.name if course.teacher_id else
-                  "Unassigned" }}
-                </td>
-                <td class="py-4">
-                  <span
-                    class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs"
-                    >Active</span
-                  >
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                <!-- Course Form -->
+                <section class="bg-white p-8 rounded-3xl shadow-card">
+                    <h3 class="text-xl font-bold mb-6">New Course</h3>
+                    <form action="/add_course" method="POST" class="space-y-4">
+                        <input type="text" name="title" placeholder="Course Title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+                        <textarea name="description" placeholder="Short Description" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-24" required></textarea>
+                        <select name="teacher_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary text-gray-500">
+                            <option value="">Assign Teacher</option>
+                            {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:shadow-lg transition">Add Course</button>
+                    </form>
+                </section>
+            </div>
+
+            <!-- Stats Chart (Placeholder for now) -->
+            <div class="bg-white p-8 rounded-3xl shadow-card">
+                <h3 class="text-xl font-bold mb-6">School Growth</h3>
+                <canvas id="growthChart" class="h-64"></canvas>
+            </div>
         </div>
-      </div>
+
+        <!-- Right Sidebar (Logs & Activity) -->
+        <div class="space-y-10">
+            <div class="bg-white p-8 rounded-3xl shadow-card">
+                <h3 class="text-xl font-bold mb-6">Audit Logs</h3>
+                <div class="space-y-6">
+                    {% for log in logs %}
+                    <div class="flex gap-4">
+                        <div class="w-2 h-2 mt-2 rounded-full bg-primary shadow-[0_0_10px_#6366f1]"></div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">{{ log.action }}</p>
+                            <p class="text-[10px] uppercase font-bold text-gray-400 mt-1">{{ log.user_ref.name }} • {{ log.timestamp.strftime('%H:%M %p') }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-gray-400 text-sm text-center py-10">No recent activity</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
+<!-- Notice Modal -->
+<div id="notice-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl">
+        <h3 class="text-2xl font-bold mb-6">Post New Announcement</h3>
+        <form action="/notices" method="POST" class="space-y-4">
+            <input type="text" name="title" placeholder="Notice Title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-accent" required>
+            <textarea name="content" placeholder="Type announcement details here..." class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-accent h-32" required></textarea>
+            <select name="target" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-accent">
+                <option value="all">Everyone</option>
+                <option value="student">Students Only</option>
+                <option value="teacher">Teachers Only</option>
+            </select>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('notice-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold transition">Cancel</button>
+                <button type="submit" class="flex-1 bg-accent text-white py-4 rounded-2xl font-bold shadow-lg transition">Post Notice</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('growthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Current'],
+            datasets: [{
+                label: 'New Enrollments',
+                data: {{ growth_data|tojson }},
+                borderColor: '#6366f1',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(99, 102, 241, 0.1)'
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+        }
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-10 max-w-6xl mx-auto">
+    <header class="mb-10">
+        <h1 class="text-3xl font-black text-gray-900">Communication Center</h1>
+        <p class="text-gray-500">Secure internal messaging for staff and students</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- New Message & Contacts -->
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+            <h3 class="text-xl font-bold mb-6">Send Message</h3>
+            <form action="/messages" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Recipient</label>
+                    <select name="receiver_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-14" required>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.name }} ({{ u.role }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Content</label>
+                    <textarea name="content" placeholder="Type your message here..." class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-40" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg hover:shadow-primary/30 transition">Send Now</button>
+            </form>
+        </div>
+
+        <!-- Inbox / History -->
+        <div class="lg:col-span-2 space-y-10">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                <h3 class="text-xl font-bold mb-8">Inbox</h3>
+                <div class="space-y-6">
+                    {% for msg in inbox %}
+                    <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100 flex gap-5">
+                        <img src="https://i.pravatar.cc/40?u={{ msg.sender_id }}" class="w-10 h-10 rounded-xl">
+                        <div>
+                            <div class="flex items-center gap-3 mb-1">
+                                <span class="font-bold text-gray-900">{{ msg.sender.name }}</span>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">{{ msg.timestamp.strftime('%H:%M %p') }}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">{{ msg.content }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="py-20 text-center text-gray-400 italic">No messages received yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                <h3 class="text-xl font-bold mb-8">Sent Messages</h3>
+                <div class="space-y-6 opacity-60">
+                    {% for msg in outbox %}
+                    <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="font-bold text-gray-900">To: {{ msg.receiver.name }}</span>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase">{{ msg.timestamp.strftime('%H:%M %p') }}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 leading-relaxed">{{ msg.content }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

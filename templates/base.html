@@ -1,78 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Dashboard</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-
-<script>
-
-tailwind.config = {
-
-theme: {
-
-extend: {
-
-fontFamily: {
-
-inter: ['Inter', 'sans-serif'],
-
-},
-
-colors: {
-
-primary: '#6366f1',
-
-secondary: '#8b5cf6',
-
-},
-
-boxShadow: {
-
-card: '0 10px 25px rgba(0,0,0,0.05)',
-
-cardHover: '0 20px 40px rgba(0,0,0,0.08)',
-
-}
-
-}
-
-}
-
-}
-
-</script>
-
-<style>
-
-body{
-
-font-family: 'Inter', sans-serif;
-
-background:#f8fafc;
-
-}
-
-</style>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management | V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { inter: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#6366f1', secondary: '#8b5cf6', accent: '#f43f5e' },
+                    boxShadow: { card: '0 10px 25px rgba(0,0,0,0.05)', cardHover: '0 20px 40px rgba(0,0,0,0.08)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .nav-link { 
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .nav-link.active { 
+            background: #6366f1;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+        .nav-link:not(.active) { 
+            color: #6b7280;
+        }
+        .nav-link:not(.active):hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+    </style>
 </head>
-
-
 <body>
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-100 p-6 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl">S</div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">CampusPro</span>
+                </div>
+                
+                <nav class="space-y-2">
+                    {% if session.get('role') == 'admin' %}
+                        <a href="/admin" class="nav-link">Dashboard</a>
+                        <a href="/admin/fees" class="nav-link">Financials</a>
+                        <a href="/admin/timetable" class="nav-link">Timetable</a>
+                    {% elif session.get('role') == 'teacher' %}
+                        <a href="/teacher" class="nav-link">My Classes</a>
+                    {% elif session.get('role') == 'parent' %}
+                        <a href="/parent" class="nav-link">My Children</a>
+                    {% else %}
+                        <a href="/" class="nav-link">Learning</a>
+                    {% endif %}
+                    <a href="/messages" class="nav-link">Messages</a>
+                </nav>
+            </div>
+            
+            <div class="pt-6 border-t border-gray-100">
+                <a href="/logout" class="flex items-center gap-3 py-3 px-4 rounded-xl text-red-500 hover:bg-red-50 transition font-medium">
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
 
-{% block content %}
-
-{% endblock %}
-
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <script>
+        // Set active class based on URL
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === window.location.pathname) {
+                link.classList.add('active');
+            }
+        });
+    </script>
 </body>
-
 </html>

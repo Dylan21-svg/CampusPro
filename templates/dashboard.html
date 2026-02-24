@@ -1,84 +1,129 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex h-screen bg-gray-50">
-    <!-- SIDEBAR -->
-    <div class="w-64 bg-white p-6 shadow-lg flex flex-col justify-between">
+<div class="p-10">
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-10">
         <div>
-            <h1 class="text-2xl font-bold text-primary mb-10">Student App</h1>
-            <nav class="space-y-4">
-                <a href="/" class="flex items-center gap-3 text-primary font-bold">Dashboard</a>
-            </nav>
+            <h1 class="text-3xl font-bold text-gray-900">Education Portal</h1>
+            <p class="text-gray-500 mt-1">Logged in as {{ user.name }} (Student)</p>
         </div>
-        <a href="/logout" class="text-red-400 hover:text-red-600 font-medium">Logout</a>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="flex-1 p-10 overflow-y-auto">
-        <!-- TOP BAR -->
-        <header class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold text-gray-800">Hello, {{ user.name }}</h2>
-            <div class="flex items-center gap-4">
-                <div class="bg-white p-3 rounded-full shadow-sm">🔔</div>
-                <img src="https://i.pravatar.cc/40?u={{ user.id }}" class="rounded-full shadow-md">
+        <div class="flex items-center gap-4">
+            <div class="relative">
+                <div class="bg-white p-3 rounded-full shadow-card cursor-pointer">🔔</div>
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-bold">{{ notices|length }}</div>
             </div>
-        </header>
-
-        <!-- HERO CARD -->
-        <div class="bg-gradient-to-r from-primary to-secondary text-white p-8 rounded-3xl shadow-lg mb-10">
-            <p class="text-sm opacity-80 mb-2">WELCOME TO SCHOOL</p>
-            <h2 class="text-3xl font-bold mb-4">Manage Your Learning Journey Effortlessly</h2>
+            <img src="https://i.pravatar.cc/48?u={{ user.id }}" class="rounded-2xl shadow-md border-2 border-white">
         </div>
+    </header>
 
-        <!-- MY COURSES -->
-        <h3 class="font-bold text-xl mb-6">My Enrolled Courses</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {% for course in courses %}
-            <div class="bg-white p-6 rounded-3xl shadow-card hover:shadow-cardHover transition">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 font-bold">
-                        {{ course.title[0]|upper }}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- Dashboard Main -->
+        <div class="lg:col-span-2 space-y-10">
+            <!-- Hero Card -->
+            <div class="bg-gradient-to-br from-primary via-indigo-600 to-secondary p-10 rounded-[3rem] text-white shadow-2xl flex items-center justify-between relative overflow-hidden group">
+                <div class="relative z-10">
+                    <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase backdrop-blur-md">V2 System Active</span>
+                    <h2 class="text-4xl font-black mt-6 leading-tight">Your Semester<br>At a Glance</h2>
+                    <p class="mt-4 opacity-80 max-w-xs font-medium">Continue your progress in {{ courses|length }} active courses.</p>
+                </div>
+                <!-- Decorative Circle -->
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition duration-700"></div>
+            </div>
+
+            <!-- Courses Section -->
+            <section>
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-2xl font-black text-gray-800">My Learning</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-inter">
+                    {% for course in courses %}
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-card hover:shadow-cardHover hover:-translate-y-1 transition duration-300">
+                        <div class="flex items-center gap-5 mb-6">
+                            <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-primary font-black text-xl shadow-inner">
+                                {{ course.title[0] }}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">{{ course.title }}</h4>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-tighter">{{ course.teacher_ref.name if course.teacher_id else "Unassigned" }}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 leading-relaxed mb-8 line-clamp-2">{{ course.description }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-primary bg-indigo-50 px-4 py-2 rounded-xl">View Materials</span>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="font-bold">{{ course.title }}</h4>
-                        <p class="text-xs text-gray-400 uppercase font-semibold">{{ course.teacher_ref.name if course.teacher_id else "No Teacher" }}</p>
+                    {% else %}
+                    <div class="col-span-full py-20 bg-gray-100/50 rounded-[3rem] border-2 border-dashed border-gray-200 text-center">
+                        <p class="text-gray-400 font-bold">No active enrollments</p>
                     </div>
+                    {% endfor %}
                 </div>
-                <p class="text-sm text-gray-500 mb-4">{{ course.description }}</p>
-                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                    <div class="bg-primary h-full w-[10%]"></div>
+            </section>
+
+            <!-- Discovery Section -->
+            <section>
+                <h3 class="text-2xl font-black text-gray-800 mb-8">Discover Courses</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {% for all_course in all_courses %}
+                        {% if all_course not in courses %}
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-primary transition">
+                            <h4 class="font-bold text-gray-900 mb-2 truncate">{{ all_course.title }}</h4>
+                            <p class="text-xs text-gray-400 mb-6 line-clamp-2 h-8">{{ all_course.description }}</p>
+                            <a href="/enroll/{{ all_course.id }}" class="block w-full text-center py-3 bg-gray-50 text-primary font-bold rounded-2xl hover:bg-primary hover:text-white transition">Enroll</a>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-            </div>
-            {% else %}
-            <div class="col-span-full py-10 text-center bg-white rounded-3xl border-2 border-dashed border-gray-200">
-                <p class="text-gray-400">You are not enrolled in any courses yet.</p>
-            </div>
-            {% endfor %}
+            </section>
         </div>
 
-        <!-- EXPLORE COURSES -->
-        <h3 class="font-bold text-xl mb-6 mt-12">Available Courses</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for all_course in all_courses %}
-                {% if all_course not in courses %}
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <h4 class="font-bold mb-2">{{ all_course.title }}</h4>
-                    <p class="text-sm text-gray-400 mb-6 line-clamp-2">{{ all_course.description }}</p>
-                    <a href="/enroll/{{ all_course.id }}" class="inline-block w-full text-center py-3 bg-gray-50 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition">Enroll Now</a>
+        <!-- Right Side: Notices & Stats -->
+        <aside class="space-y-10">
+            <!-- Notice Board -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xl font-bold">News Board</h3>
+                    <span class="text-[10px] font-black text-primary bg-indigo-50 px-3 py-1 rounded-lg uppercase">Alerts</span>
                 </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+                <div class="space-y-8">
+                    {% for notice in notices %}
+                    <div class="relative pl-6 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-accent before:rounded-full">
+                        <h4 class="font-bold text-gray-900 leading-tight mb-2">{{ notice.title }}</h4>
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ notice.content }}</p>
+                        <span class="text-[9px] font-bold text-gray-300 uppercase">{{ notice.date_posted.strftime('%d %b %Y') }}</span>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-gray-400 text-xs py-10">No recent updates</p>
+                    {% endfor %}
+                </div>
+            </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="mb-4 p-4 rounded-xl bg-indigo-50 text-primary font-medium">
-                {{ message }}
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+            <!-- User Progress Chart -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
+                <h3 class="text-xl font-bold mb-6">Attendance</h3>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </aside>
     </div>
 </div>
+
+<script>
+    const aCtx = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(aCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+                data: {{ attendance_data|tojson }},
+                backgroundColor: ['#6366f1', '#f1f5f9'],
+                borderWidth: 0,
+                cutout: '80%'
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
 {% endblock %}
