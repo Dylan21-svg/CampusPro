@@ -49,7 +49,7 @@ def process_payment():
     
     user = User.query.get(user_id)
     user.is_pro = True
-    user.pro_expiry_on = datetime.utcnow() + timedelta(days=365)
+    user.pro_expiry_on = datetime.utcnow() + timedelta(days=30)
     
     db.session.commit()
     

@@ -156,6 +156,15 @@
                 </div>
 
                 <div class="flex items-center gap-3">
+                    <!-- Quick Actions -->
+                    <div class="flex items-center gap-4">
+                        <!-- Currency Switcher -->
+                        <div class="hidden sm:flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                            <a href="{{ url_for('set_currency', code='USD') }}" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all {% if session.get('currency', 'USD') == 'USD' %}bg-white dark:bg-gray-700 shadow-sm text-purple-600{% else %}text-gray-400 hover:text-gray-600{% endif %}">USD</a>
+                            <a href="{{ url_for('set_currency', code='XAF') }}" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all {% if session.get('currency') == 'XAF' %}bg-white dark:bg-gray-700 shadow-sm text-purple-600{% else %}text-gray-400 hover:text-gray-600{% endif %}">XAF</a>
+                        </div>
+                    </div>
+
                     <!-- Theme Toggle -->
                     <button onclick="toggleDarkMode()" class="p-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all">
                         <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>

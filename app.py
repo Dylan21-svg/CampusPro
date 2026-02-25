@@ -152,6 +152,24 @@ def messages():
     users = User.query.filter(User.id != user_id).all()
     return render_template("messages.html", inbox=inbox, outbox=outbox, users=users)
 
+@app.route("/set_currency/<string:code>")
+def set_currency(code):
+    if code in ["USD", "XAF"]:
+        session["currency"] = code
+        flash(f"Currency switched to {code}", "info")
+    return redirect(request.referrer or url_for("dashboard"))
+
+@app.context_processor
+def utility_processor():
+    def format_price(amount):
+        currency = session.get("currency", "USD")
+        if currency == "XAF":
+            # Rough conversion 1 USD = 600 XAF
+            converted = amount * 600
+            return f"{converted:,.0f} FCFA"
+        return f"${amount:,.2f}"
+    return dict(format_price=format_price)
+
 # --- PRO FEATURES ---
 @app.route("/admin/analytics")
 @role_required(["admin"])
