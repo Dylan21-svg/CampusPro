@@ -1,64 +1,118 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-10">
-    <header class="flex justify-between items-center mb-10">
+<div class="space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black text-gray-900">Staff Attendance</h1>
-            <p class="text-gray-500 mt-1">Track and manage teacher daily presence</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white leading-tight">Faculty Presence</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Monitor and log daily attendance for all registered instructors.</p>
         </div>
-        <a href="/admin" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl font-bold hover:bg-gray-200 transition">Back to Dashboard</a>
+        <div class="flex items-center gap-3">
+            <button onclick="document.getElementById('export-modal').classList.remove('hidden')" class="flex items-center gap-2 bg-white dark:bg-dark-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm">
+                <i data-lucide="download" class="w-4 h-4 text-purple-600"></i>
+                Export Logs
+            </button>
+        </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <!-- Mark Attendance -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-            <h3 class="text-xl font-bold mb-6 text-gray-800">Record Today's Presence</h3>
-            <form action="/admin/teacher_attendance" method="POST" class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Mark Attendance Panel -->
+        <div class="bg-white dark:bg-dark-800 rounded-[2.5rem] shadow-sm p-8 border border-gray-100 dark:border-gray-700 h-fit sticky top-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-inner">
+                    <i data-lucide="check-square" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white italic">Mark Presence</h3>
+            </div>
+            
+            <form action="{{ url_for('manage_teacher_attendance') }}" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-xs font-black text-gray-400 uppercase mb-2">Select Teacher</label>
-                    <select name="teacher_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
-                        {% for teacher in teachers %}
-                        <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Instructor</label>
+                    <select name="teacher_id" class="w-full px-5 py-3.5 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-purple-600 outline-none transition-all text-sm font-bold text-gray-700 dark:text-gray-200 cursor-pointer">
+                        {% for t in teachers %}
+                        <option value="{{ t.id }}">{{ t.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-black text-gray-400 uppercase mb-2">Status</label>
-                    <select name="status" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                        <option value="Leave">On Leave</option>
-                    </select>
+
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1 ml-1 tracking-widest">Status Flag</label>
+                    <div class="grid grid-cols-1 gap-3">
+                        <label class="relative flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900 rounded-2xl border-2 border-transparent hover:border-purple-100 dark:hover:border-purple-900 cursor-pointer transition-all group">
+                            <input type="radio" name="status" value="Present" checked class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-800 dark:text-gray-100 group-hover:text-purple-600 transition-colors">Present</span>
+                                <span class="text-[10px] text-gray-400 font-medium">Reporting for duty</span>
+                            </div>
+                            <i data-lucide="sun" class="absolute right-4 w-5 h-5 text-gray-200 dark:text-gray-800 group-hover:text-purple-100 transition-colors"></i>
+                        </label>
+
+                        <label class="relative flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900 rounded-2xl border-2 border-transparent hover:border-red-100 dark:hover:border-red-900 cursor-pointer transition-all group">
+                            <input type="radio" name="status" value="Absent" class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-800 dark:text-gray-100 group-hover:text-red-600 transition-colors">Absent</span>
+                                <span class="text-[10px] text-gray-400 font-medium">Unexcused absence</span>
+                            </div>
+                            <i data-lucide="cloud-off" class="absolute right-4 w-5 h-5 text-gray-200 dark:text-gray-800 group-hover:text-red-100 transition-colors"></i>
+                        </label>
+
+                        <label class="relative flex items-center gap-4 p-4 bg-gray-50 dark:bg-dark-900 rounded-2xl border-2 border-transparent hover:border-amber-100 dark:hover:border-amber-900 cursor-pointer transition-all group">
+                            <input type="radio" name="status" value="Leave" class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-800 dark:text-gray-100 group-hover:text-amber-600 transition-colors">Official Leave</span>
+                                <span class="text-[10px] text-gray-400 font-medium">Approved time off</span>
+                            </div>
+                            <i data-lucide="plane" class="absolute right-4 w-5 h-5 text-gray-200 dark:text-gray-800 group-hover:text-amber-100 transition-colors"></i>
+                        </label>
+                    </div>
                 </div>
-                <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg hover:opacity-90 transition">Save Attendance</button>
+
+                <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-50 dark:shadow-none hover:bg-purple-700 hover:-translate-y-1 transition-all">Submit Daily Record</button>
             </form>
         </div>
 
         <!-- Attendance Logs -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] shadow-card">
-            <h3 class="text-xl font-bold mb-6 text-gray-800">Recent Logs</h3>
-            <div class="overflow-x-auto">
+        <div class="lg:col-span-2 bg-white dark:bg-dark-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="p-8 border-b border-gray-50 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">Historical Repository</h3>
+                    <p class="text-xs text-gray-400 mt-1 font-bold italic tracking-tight uppercase">Audit-ready attendance logs</p>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto overflow-y-auto max-h-[700px] custom-scrollbar">
                 <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-gray-400 text-[10px] uppercase font-black tracking-widest border-b border-gray-100">
-                            <th class="pb-4">Staff Member</th>
-                            <th class="pb-4">Date</th>
-                            <th class="pb-4 text-right">Status</th>
+                    <thead class="bg-gray-50/50 dark:bg-dark-900/50 sticky top-0 z-10 backdrop-blur-sm">
+                        <tr>
+                            <th class="px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Instructor Profile</th>
+                            <th class="px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date / Cycle</th>
+                            <th class="px-8 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Verification Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
                         {% for record in attendance %}
-                        <tr>
-                            <td class="py-4">
-                                <span class="font-bold text-gray-900">{{ record.teacher_ref.name if record.teacher_ref else "Unknown" }}</span>
+                        <tr class="hover:bg-gray-50/30 dark:hover:bg-gray-700/20 transition-colors group">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name={{ record.teacher_ref.name if record.teacher_ref else 'X' }}&background=f3f4f6&color=7c3aed&bold=true" class="w-10 h-10 rounded-xl shadow-inner">
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-900 dark:text-white group-hover:text-purple-600 transition-colors truncate max-w-[150px]">{{ record.teacher_ref.name if record.teacher_ref else "Legacy Profile" }}</p>
+                                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-tighter">ID: #FAC-{{ record.teacher_id }}</p>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="py-4 text-sm text-gray-500">{{ record.date.strftime('%d %B, %Y') }}</td>
-                            <td class="py-4 text-right">
-                                <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase 
-                                    {% if record.status == 'Present' %}bg-green-100 text-green-600
-                                    {% elif record.status == 'Absent' %}bg-red-100 text-red-600
-                                    {% else %}bg-amber-100 text-amber-600{% endif %}">
+                            <td class="px-8 py-6">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-200 underline decoration-purple-200 dark:decoration-purple-900 underline-offset-4">{{ record.date.strftime('%B %d, %Y') }}</span>
+                                    <span class="text-[9px] text-gray-400 font-bold mt-1.5 uppercase italic">Electronic Logged</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest
+                                    {% if record.status == 'Present' %}bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400
+                                    {% elif record.status == 'Absent' %}bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400
+                                    {% else %}bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400{% endif %}">
                                     {{ record.status }}
                                 </span>
                             </td>
@@ -66,8 +120,18 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                
+                {% if not attendance %}
+                <div class="py-32 text-center">
+                    <div class="w-20 h-20 bg-gray-50 dark:bg-dark-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                        <i data-lucide="database" class="w-10 h-10 text-gray-200 dark:text-gray-800"></i>
+                    </div>
+                    <p class="text-gray-400 font-bold italic tracking-tight">System storage is currently empty.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+<script>lucide.createIcons();</script>
 {% endblock %}

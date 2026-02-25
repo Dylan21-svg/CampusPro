@@ -1,65 +1,115 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-10 max-w-6xl mx-auto">
-    <header class="mb-10">
-        <h1 class="text-3xl font-black text-gray-900">Communication Center</h1>
-        <p class="text-gray-500">Secure internal messaging for staff and students</p>
+<div class="space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Communication Center</h1>
+            <p class="text-gray-500 mt-1">Secure internal messaging for staff and students</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2.5 rounded-xl font-bold hover:bg-purple-200 transition-all text-sm shadow-sm ring-1 ring-purple-200">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                Preferences
+            </button>
+        </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <!-- New Message & Contacts -->
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-            <h3 class="text-xl font-bold mb-6">Send Message</h3>
-            <form action="/messages" method="POST" class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- New Message Composition -->
+        <div class="bg-white rounded-[2rem] shadow-sm p-8 border border-gray-100 h-fit sticky top-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-xl font-bold italic tracking-tight">New Message</h3>
+            </div>
+            <form action="/messages" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Recipient</label>
-                    <select name="receiver_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-14" required>
-                        {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.name }} ({{ u.role }})</option>
-                        {% endfor %}
-                    </select>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Recipient</label>
+                    <div class="relative group">
+                        <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-purple-600 transition-colors"></i>
+                        <select name="receiver_id" class="w-full pl-11 pr-4 py-4 bg-gray-50 rounded-2xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm text-gray-700 cursor-pointer" required>
+                            <option value="" disabled selected>Select Recipient</option>
+                            {% for u in users %}
+                            <option value="{{ u.id }}">{{ u.name }} ({{ u.role | capitalize }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Content</label>
-                    <textarea name="content" placeholder="Type your message here..." class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-40" required></textarea>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Message Content</label>
+                    <textarea name="content" placeholder="Share your thoughts..." class="w-full p-6 bg-gray-50 rounded-2xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm h-48 resize-none" required></textarea>
                 </div>
-                <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg hover:shadow-primary/30 transition">Send Now</button>
+                <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 hover:-translate-y-1 transition-all duration-300">
+                    Send Direct Message
+                    <i data-lucide="send" class="w-4 h-4 inline-block ml-2 group-hover:translate-x-1 transition-all"></i>
+                </button>
             </form>
         </div>
 
-        <!-- Inbox / History -->
-        <div class="lg:col-span-2 space-y-10">
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                <h3 class="text-xl font-bold mb-8">Inbox</h3>
-                <div class="space-y-6">
+        <!-- Inbox & Sent History -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Inbox List -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-8 border-b border-gray-50 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                            <i data-lucide="inbox" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 tracking-tight">Inbox Feed</h3>
+                    </div>
+                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg uppercase tracking-widest">Received</span>
+                </div>
+                <div class="p-6 space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
                     {% for msg in inbox %}
-                    <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100 flex gap-5">
-                        <img src="https://i.pravatar.cc/40?u={{ msg.sender_id }}" class="w-10 h-10 rounded-xl">
-                        <div>
-                            <div class="flex items-center gap-3 mb-1">
-                                <span class="font-bold text-gray-900">{{ msg.sender.name }}</span>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">{{ msg.timestamp.strftime('%H:%M %p') }}</span>
+                    <div class="group p-6 bg-gray-50/50 rounded-2xl border border-transparent hover:border-purple-200 hover:bg-white hover:shadow-md transition-all flex gap-5">
+                        <div class="flex-shrink-0">
+                            <img src="https://ui-avatars.com/api/?name={{ msg.sender.name }}&background=7c3aed&color=fff&bold=true" class="w-12 h-12 rounded-xl shadow-sm group-hover:scale-105 transition-transform">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-gray-900 truncate group-hover:text-purple-600 transition-colors">{{ msg.sender.name }}</h4>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">{{ msg.timestamp.strftime('%H:%M %p') }}</span>
                             </div>
-                            <p class="text-sm text-gray-600 leading-relaxed">{{ msg.content }}</p>
+                            <p class="text-sm text-gray-600 leading-relaxed italic border-l-2 border-transparent group-hover:border-purple-200 pl-4 transition-all">{{ msg.content }}</p>
                         </div>
                     </div>
                     {% else %}
-                    <div class="py-20 text-center text-gray-400 italic">No messages received yet.</div>
+                    <div class="py-24 text-center">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                            <i data-lucide="mail-warning" class="w-10 h-10 text-gray-200"></i>
+                        </div>
+                        <p class="text-gray-400 font-bold italic">No active conversations found</p>
+                        <p class="text-xs text-gray-400 mt-1">Start a conversation by sending a new message.</p>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                <h3 class="text-xl font-bold mb-8">Sent Messages</h3>
-                <div class="space-y-6 opacity-60">
-                    {% for msg in outbox %}
-                    <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100">
-                        <div class="flex items-center gap-3 mb-1">
-                            <span class="font-bold text-gray-900">To: {{ msg.receiver.name }}</span>
-                            <span class="text-[10px] text-gray-400 font-bold uppercase">{{ msg.timestamp.strftime('%H:%M %p') }}</span>
+            <!-- Outbox Snippet -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-8 border-b border-gray-50 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400">
+                            <i data-lucide="send-to-back" class="w-5 h-5"></i>
                         </div>
-                        <p class="text-sm text-gray-600 leading-relaxed">{{ msg.content }}</p>
+                        <h3 class="text-lg font-bold text-gray-600 tracking-tight italic">Message Archive</h3>
+                    </div>
+                    <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-lg uppercase tracking-widest">History</span>
+                </div>
+                <div class="p-6 space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar opacity-70 hover:opacity-100 transition-opacity">
+                    {% for msg in outbox %}
+                    <div class="p-6 bg-gray-50/50 rounded-xl border border-transparent hover:border-gray-200 transition-all">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">To:</span>
+                                <h4 class="text-sm font-bold text-gray-800">{{ msg.receiver.name }}</h4>
+                            </div>
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{{ msg.timestamp.strftime('%H:%M %p') }}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed line-clamp-1 italic">{{ msg.content }}</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -67,4 +117,8 @@
         </div>
     </div>
 </div>
+
+<script>
+    lucide.createIcons();
+</script>
 {% endblock %}

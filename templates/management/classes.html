@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 leading-tight">School Classes</h1>
+            <p class="text-gray-500 mt-1">Organize student groups and assign primary rooms.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="document.getElementById('add-class-modal').classList.remove('hidden')" class="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-purple-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-purple-100">
+                <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                Set New Class
+            </button>
+        </div>
+    </header>
+
+    <!-- Grid View -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for c in classes %}
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-md hover:border-purple-200 transition-all group">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 font-black text-xl border border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-500">
+                    {{ c.name[0] }}
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openEditClass('{{ c.id }}', '{{ c.name }}', '{{ c.description }}')" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    <a href="{{ url_for('classes.delete_class', id=c.id) }}" onclick="return confirm('Archive this class?')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2 truncate">{{ c.name }}</h3>
+            <p class="text-xs text-gray-400 leading-relaxed italic line-clamp-2 h-8">{{ c.description or 'No description provided for this academic group.' }}</p>
+            
+            <div class="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-gray-50">
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Active Seats</span>
+                    <span class="text-base font-black text-gray-800">{{ c.students | length }} Students</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Curriculum</span>
+                    <span class="text-base font-black text-gray-800">{{ c.courses | length }} Subjects</span>
+                </div>
+            </div>
+            
+            <button class="w-full mt-8 bg-gray-50 text-gray-600 py-3 rounded-xl text-xs font-bold hover:bg-purple-50 hover:text-purple-600 transition-all border border-transparent hover:border-purple-100">
+                View All Records
+            </button>
+        </div>
+        {% else %}
+        <div class="col-span-full py-24 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-100">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-gray-100">
+                <i data-lucide="layout" class="w-10 h-10 text-gray-200"></i>
+            </div>
+            <p class="text-gray-400 font-bold italic tracking-tight">No classes organized yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div id="add-class-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white max-w-md w-full rounded-[2.5rem] p-10 shadow-2xl">
+        <h3 class="text-2xl font-bold text-gray-900 italic mb-8 flex items-center gap-3">
+            <i data-lucide="plus-square" class="text-purple-600"></i>
+            Organize New Class
+        </h3>
+        <form action="{{ url_for('classes.add_class') }}" method="POST" class="space-y-6">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Class Identifier</label>
+                <input type="text" name="name" placeholder="e.g. Grade 10-A" required class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm font-bold">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Brief Description</label>
+                <textarea name="description" placeholder="Room number, stream details..." class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm h-32 resize-none"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 hover:-translate-y-1 transition-all">Finalize Organization</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-class-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white max-w-md w-full rounded-[2.5rem] p-10 shadow-2xl">
+        <h3 class="text-2xl font-bold text-gray-900 italic mb-8">Adjust Class Details</h3>
+        <form id="edit-class-form" action="" method="POST" class="space-y-6">
+            <input type="text" name="name" id="edit-cls-name" required class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm font-bold">
+            <textarea name="description" id="edit-cls-desc" class="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm h-32 resize-none"></textarea>
+            <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-50 hover:bg-blue-700 transition-all">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditClass(id, name, desc) {
+        const form = document.getElementById('edit-class-form');
+        form.action = `/admin/classes/edit/${id}`;
+        document.getElementById('edit-cls-name').value = name;
+        document.getElementById('edit-cls-desc').value = desc;
+        document.getElementById('edit-class-modal').classList.remove('hidden');
+    }
+    lucide.createIcons();
+</script>
+{% endblock %}

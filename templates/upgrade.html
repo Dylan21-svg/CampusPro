@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-12">
+    <!-- Header -->
+    <header class="text-center max-w-2xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Elevate Your School with Schooli <span class="text-purple-600">Pro</span></h1>
+        <p class="text-gray-500 text-lg leading-relaxed">Unlock advanced analytics, automated reporting, and comprehensive management tools for just $100/year.</p>
+    </header>
+
+    <!-- Pricing Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <!-- Free Tier -->
+        <div class="bg-white rounded-3xl p-10 border border-gray-100 shadow-sm opacity-60 flex flex-col">
+            <div class="mb-8">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg">Standard</span>
+                <h3 class="text-2xl font-bold text-gray-900 mt-4">Free Plan</h3>
+                <div class="mt-4 flex items-baseline gap-1">
+                    <span class="text-4xl font-black text-gray-900">$0</span>
+                    <span class="text-gray-400 font-bold">/year</span>
+                </div>
+            </div>
+            <ul class="space-y-4 mb-10 flex-1">
+                <li class="flex items-center gap-3 text-sm text-gray-600">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Basic User Management
+                </li>
+                <li class="flex items-center gap-3 text-sm text-gray-600">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Course Scheduling
+                </li>
+                <li class="flex items-center gap-3 text-sm text-gray-600">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Messaging System
+                </li>
+            </ul>
+            <button disabled class="w-full bg-gray-100 text-gray-400 py-4 rounded-2xl font-bold cursor-not-allowed">Current Plan</button>
+        </div>
+
+        <!-- Pro Tier -->
+        <div class="bg-white rounded-3xl p-10 border-2 border-purple-600 shadow-xl shadow-purple-50 relative overflow-hidden flex flex-col scale-105">
+            <div class="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-6 py-2 rounded-bl-3xl uppercase tracking-widest shadow-lg">Most Popular</div>
+            
+            <div class="mb-8">
+                <span class="text-xs font-bold text-purple-600 uppercase tracking-widest bg-purple-50 px-3 py-1 rounded-lg">Enterprise</span>
+                <h3 class="text-2xl font-bold text-gray-900 mt-4">Pro Unlimited</h3>
+                <div class="mt-4 flex items-baseline gap-1">
+                    <span class="text-4xl font-black text-gray-900">$100</span>
+                    <span class="text-gray-400 font-bold">/year</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-x-4 gap-y-3 mb-10 flex-1">
+                <div class="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                    <i data-lucide="zap" class="w-3 h-3 text-purple-600"></i> Advanced Analytics
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                    <i data-lucide="zap" class="w-3 h-3 text-purple-600"></i> Unlimited Users
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                    <i data-lucide="zap" class="w-3 h-3 text-purple-600"></i> PDF/Excel Reports
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                    <i data-lucide="zap" class="w-3 h-3 text-purple-600"></i> Online Exams
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                    <i data-lucide="zap" class="w-3 h-3 text-purple-600"></i> SMS Notifications
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-700 font-medium">
+                    <i data-lucide="zap" class="w-3 h-3 text-purple-600"></i> File Storage
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('payment-modal').classList.remove('hidden')" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-100 hover:bg-purple-700 hover:-translate-y-1 transition-all duration-300">Upgrade Now</button>
+        </div>
+    </div>
+</div>
+
+<!-- Selection Modal -->
+<div id="payment-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+    <div class="bg-white max-w-md w-full rounded-[2.5rem] p-10 shadow-2xl scale-in">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-2xl font-bold text-gray-900 italic">Select Payment</h3>
+            <button onclick="document.getElementById('payment-modal').classList.add('hidden')" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <i data-lucide="x" class="w-5 h-5 text-gray-400"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('upgrade.process_payment') }}" method="POST" class="space-y-4">
+            <label class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-purple-200 cursor-pointer transition-all group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <i data-lucide="credit-card" class="w-5 h-5 text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900">Stripe</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-black">Credit / Debit Card</p>
+                    </div>
+                </div>
+                <input type="radio" name="payment_method" value="stripe" checked class="w-5 h-5 text-purple-600 focus:ring-purple-500">
+            </label>
+
+            <label class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-purple-200 cursor-pointer transition-all group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <i data-lucide="paypal" class="w-5 h-5 text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900">PayPal</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-black">Standard Checkout</p>
+                    </div>
+                </div>
+                <input type="radio" name="payment_method" value="paypal" class="w-5 h-5 text-purple-600 focus:ring-purple-500">
+            </label>
+
+            <label class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-purple-200 cursor-pointer transition-all group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <i data-lucide="smartphone" class="w-5 h-5 text-amber-500"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900">Mobile Money</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-black">MTN / Orange Money</p>
+                    </div>
+                </div>
+                <input type="radio" name="payment_method" value="momo" class="w-5 h-5 text-purple-600 focus:ring-purple-500">
+            </label>
+
+            <label class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-purple-200 cursor-pointer transition-all group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <i data-lucide="building-2" class="w-5 h-5 text-gray-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900">Bank Transfer</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-black">Manual Verification</p>
+                    </div>
+                </div>
+                <input type="radio" name="payment_method" value="bank_transfer" class="w-5 h-5 text-purple-600 focus:ring-purple-500">
+            </label>
+
+            <button type="submit" class="w-full bg-gray-900 text-white py-5 rounded-2xl font-bold shadow-xl shadow-gray-200 hover:bg-black hover:-translate-y-1 transition-all duration-300 mt-6">Secure Checkout</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+
+<style>
+    @keyframes scale-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .scale-in { animation: scale-in 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+</style>
+{% endblock %}

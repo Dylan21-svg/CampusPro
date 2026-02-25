@@ -1,0 +1,6 @@
+Flask==3.x
+Flask-SQLAlchemy
+Werkzeug
+pytest
+faker
+locust

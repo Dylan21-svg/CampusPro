@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 leading-tight">Faculty Directory</h1>
+            <p class="text-gray-500 mt-1">Manage all teaching staff and their assignments.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="document.getElementById('add-teacher-modal').classList.remove('hidden')" class="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-purple-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-purple-100">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                Add New Teacher
+            </button>
+            <a href="{{ url_for('teachers.export_teachers') }}" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-sm">
+                <i data-lucide="download" class="w-4 h-4 text-purple-600"></i>
+                Export
+            </a>
+        </div>
+    </header>
+
+    <!-- Filters & Search -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <form action="{{ url_for('teachers.list_teachers') }}" method="GET" class="relative w-full md:w-96 group">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-purple-600 transition-colors"></i>
+            <input type="text" name="search" value="{{ search }}" placeholder="Search by name or email..." class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm">
+        </form>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <select class="flex-1 md:w-40 bg-gray-50 border border-transparent rounded-xl px-4 py-2.5 text-sm font-medium text-gray-600 focus:bg-white focus:border-purple-600 outline-none transition-all cursor-pointer">
+                <option>All Departments</option>
+                <option>Science</option>
+                <option>Arts</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Teachers Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Teacher Info</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Contact</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Courses</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                        <th class="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for t in teachers %}
+                    <tr class="hover:bg-gray-50/50 transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-bold border border-purple-100">
+                                    {{ t.name[0] }}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900">{{ t.name }}</p>
+                                    <p class="text-[10px] text-gray-400 font-medium">Faculty Member</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <p class="text-xs font-medium text-gray-600">{{ t.email }}</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">{{ t.phone or 'N/A' }}</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
+                                {{ t.courses_taught | length }} Active
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2 ring-4 ring-green-50"></span>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase">Active</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="openEditTeacher('{{ t.id }}', '{{ t.name }}', '{{ t.email }}', '{{ t.phone }}', '{{ t.address }}')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                                <a href="{{ url_for('teachers.delete_teacher', id=t.id) }}" onclick="return confirm('Archive this teacher record?')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-20 text-center">
+                            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-gray-100">
+                                <i data-lucide="users" class="w-8 h-8 text-gray-200"></i>
+                            </div>
+                            <p class="text-gray-400 font-bold italic">No faculty members found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div id="add-teacher-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white max-w-lg w-full rounded-[2rem] p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-900 italic">Add Faculty Member</h3>
+            <button onclick="document.getElementById('add-teacher-modal').classList.add('hidden')" class="p-2 hover:bg-gray-100 rounded-lg"><i data-lucide="x" class="w-5 h-5 text-gray-400"></i></button>
+        </div>
+        <form action="{{ url_for('teachers.add_teacher') }}" method="POST" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Full Name</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Email Address</label>
+                    <input type="email" name="email" required class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Secure Password</label>
+                <div class="relative group">
+                    <input type="password" id="teacher-password" name="password" placeholder="Leave blank for default (teacher123)" class="w-full pl-4 pr-12 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                    <button type="button" onclick="togglePassword('teacher-password')" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-200/50 rounded-lg">
+                        <i data-lucide="eye" class="w-4 h-4 text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Phone Number</label>
+                    <input type="text" name="phone" class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Address</label>
+                    <input type="text" name="address" class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-purple-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 transition-all mt-4">Save Teacher Profile</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-teacher-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white max-w-lg w-full rounded-[2rem] p-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-900 italic">Adjust Faculty Profile</h3>
+            <button onclick="document.getElementById('edit-teacher-modal').classList.add('hidden')" class="p-2 hover:bg-gray-100 rounded-lg"><i data-lucide="x" class="w-5 h-5 text-gray-400"></i></button>
+        </div>
+        <form id="edit-teacher-form" action="" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Full Name</label>
+                <input type="text" name="name" id="edit-name" required class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm font-bold">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Email Address</label>
+                <input type="email" name="email" id="edit-email" required class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Phone</label>
+                    <input type="text" name="phone" id="edit-phone" class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1.5 ml-1">Address</label>
+                    <input type="text" name="address" id="edit-address" class="w-full px-4 py-2.5 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-purple-600 outline-none transition-all text-sm">
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-50 hover:bg-blue-700 transition-all mt-4">Commit Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditTeacher(id, name, email, phone, address) {
+        const form = document.getElementById('edit-teacher-form');
+        form.action = `/admin/teachers/edit/${id}`;
+        document.getElementById('edit-name').value = name;
+        document.getElementById('edit-email').value = email;
+        document.getElementById('edit-phone').value = phone;
+        document.getElementById('edit-address').value = address;
+        document.getElementById('edit-teacher-modal').classList.remove('hidden');
+    }
+    lucide.createIcons();
+</script>
+{% endblock %}

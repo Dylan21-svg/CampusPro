@@ -2,80 +2,171 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Academic Transcript - {{ student.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Transcript | Schooli - {{ student.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Outfit', sans-serif; }
         @media print {
-            .no-print { display: none; }
-            body { padding: 0; }
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; margin: 0; }
+            .transcript-container { 
+                box-shadow: none !important; 
+                border: none !important; 
+                max-width: 100% !important; 
+                width: 100% !important; 
+                padding: 2rem !important;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50 p-10">
-    <div class="max-w-4xl mx-auto bg-white p-16 shadow-xl border-t-[12px] border-primary rounded-sm">
-        <div class="flex justify-between items-start mb-16">
-            <div>
-                <h1 class="text-4xl font-black text-gray-900 mb-2">CAMPUS<span class="text-primary">PRO</span></h1>
-                <p class="text-gray-400 font-bold uppercase tracking-widest text-xs">Official Academic Transcript</p>
-            </div>
-            <div class="text-right">
-                <p class="font-bold text-gray-900">Date Issued</p>
-                <p class="text-gray-500">{{ date.strftime('%d %B, %Y') }}</p>
-            </div>
-        </div>
+<body class="bg-gray-100 p-6 md:p-12 min-h-screen">
+    <div class="max-w-4xl mx-auto bg-white transcript-container shadow-2xl border-t-[10px] border-purple-600 rounded-xl p-8 md:p-16 relative overflow-hidden">
+        <!-- Decorative background elements -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-purple-50 rounded-full -mr-32 -mt-32 opacity-50 no-print"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-50 rounded-full -ml-32 -mb-32 opacity-50 no-print"></div>
 
-        <div class="grid grid-cols-2 gap-10 mb-16 pb-10 border-b border-gray-100">
-            <div>
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Student Information</p>
-                <h2 class="text-2xl font-bold text-gray-900">{{ student.name }}</h2>
-                <p class="text-gray-500">{{ student.email }}</p>
-                <p class="text-gray-500">{{ student.address or 'No address provided' }}</p>
+        <div class="relative z-10">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Schooli Academy</h1>
+                        <p class="text-[10px] font-bold text-purple-600 uppercase tracking-[0.2em]">Excellence in Education</p>
+                    </div>
+                </div>
+                <div class="text-left md:text-right">
+                    <div class="mb-1">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Document Type</span>
+                        <p class="text-lg font-bold text-gray-900 leading-tight">Official Academic Transcript</p>
+                    </div>
+                    <div class="flex items-center md:justify-end gap-2 text-gray-500 font-medium text-sm italic">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                        Issued on {{ date.strftime('%d %B, %Y') }}
+                    </div>
+                </div>
             </div>
-            <div class="text-right">
-                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Institution</p>
-                <p class="font-bold text-gray-900">CampusPro Academy</p>
-                <p class="text-gray-500">Global Education Campus</p>
+
+            <!-- Student Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 p-8 bg-gray-50/50 rounded-3xl border border-gray-100">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1 block">Student Name</label>
+                        <h2 class="text-2xl font-bold text-gray-900">{{ student.name }}</h2>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1 block">Student ID</label>
+                            <p class="font-bold text-gray-800">#SCH-{{ student.id }}0{{ student.id }}</p>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1 block">Semester</label>
+                            <p class="font-bold text-gray-800">Fall 2025</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col md:items-end justify-center">
+                    <div class="text-left md:text-right">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] mb-1 block">Contact Information</label>
+                        <p class="text-gray-600 text-sm font-medium">{{ student.email }}</p>
+                        <p class="text-gray-500 text-xs mt-1 italic">{{ student.address or 'Global Education Campus' }}</p>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <table class="w-full mb-16">
-            <thead>
-                <tr class="text-left border-b-2 border-gray-900 uppercase text-[10px] font-black tracking-wider">
-                    <th class="py-4">Course Title</th>
-                    <th class="py-4">Marks</th>
-                    <th class="py-4">Grade</th>
-                    <th class="py-4 text-right">Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                {% for result in results %}
-                <tr class="text-gray-800">
-                    <td class="py-6 font-bold">{{ result.course_ref.title }}</td>
-                    <td class="py-6">{{ result.marks }}%</td>
-                    <td class="py-6 font-bold">
-                        {% if result.marks >= 80 %}A
-                        {% elif result.marks >= 60 %}B
-                        {% elif result.marks >= 40 %}C
-                        {% else %}F{% endif %}
-                    </td>
-                    <td class="py-6 text-right">
-                        <span class="{% if result.marks >= 40 %}text-green-600{% else %}text-red-500{% endif %} font-bold">
-                            {{ 'PASSED' if result.marks >= 40 else 'FAILED' }}
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <!-- Results Table -->
+            <div class="mb-16">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b-2 border-gray-900 border-opacity-10 text-[11px] font-bold text-gray-400 uppercase tracking-widest italic">
+                            <th class="py-4">Course Designation</th>
+                            <th class="py-4">Raw Marks</th>
+                            <th class="py-4">Letter Grade</th>
+                            <th class="py-4 text-right">Progress Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for result in results %}
+                        <tr class="group hover:bg-gray-50/50 transition-colors">
+                            <td class="py-6 pr-4">
+                                <span class="text-base font-bold text-gray-800 group-hover:text-purple-600 transition-colors block">{{ result.course_ref.title }}</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase mt-1">Instructor: {{ result.course_ref.teacher_ref.name if result.course_ref.teacher_id else "Faculty Member" }}</span>
+                            </td>
+                            <td class="py-6">
+                                <span class="text-lg font-black text-gray-900">{{ result.marks }}%</span>
+                            </td>
+                            <td class="py-6">
+                                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl font-black text-white shadow-sm
+                                    {% if result.marks >= 80 %}bg-green-500
+                                    {% elif result.marks >= 60 %}bg-blue-500
+                                    {% elif result.marks >= 40 %}bg-amber-500
+                                    {% else %}bg-red-500{% endif %}">
+                                    {% if result.marks >= 80 %}A
+                                    {% elif result.marks >= 60 %}B
+                                    {% elif result.marks >= 40 %}C
+                                    {% else %}F{% endif %}
+                                </span>
+                            </td>
+                            <td class="py-6 text-right">
+                                <span class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm border
+                                    {% if result.marks >= 40 %}bg-green-50 text-green-600 border-green-100
+                                    {% else %}bg-red-50 text-red-600 border-red-100{% endif %}">
+                                    <i data-lucide="{% if result.marks >= 40 %}check-circle{% else %}x-circle{% endif %}" class="w-3.5 h-3.5 mr-2"></i>
+                                    {{ 'PASSED' if result.marks >= 40 else 'FAILED' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if not results %}
+                <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-100 mt-4">
+                    <i data-lucide="clipboard-x" class="w-12 h-12 text-gray-200 mx-auto mb-4"></i>
+                    <p class="text-gray-400 font-bold italic">No academic records found for this student.</p>
+                </div>
+                {% endif %}
+            </div>
 
-        <div class="bg-gray-50 p-8 rounded-2xl flex justify-between items-center no-print">
-            <p class="text-gray-500 text-sm italic">This is a system-generated academic record.</p>
-            <button onclick="window.print()" class="bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition">
-                Print Transcript
-            </button>
+            <!-- Footer / Verification -->
+            <div class="flex flex-col md:flex-row justify-between items-end gap-12 pt-12 border-t border-gray-100">
+                <div class="max-w-xs">
+                    <p class="text-[11px] text-gray-400 italic leading-relaxed">
+                        This document is a certified system-generated academic transcript from the Schooli Management System. Any alterations render this document null and void.
+                    </p>
+                </div>
+                <div class="text-center min-w-[200px]">
+                    <div class="w-48 h-px bg-gray-200 mx-auto mb-4"></div>
+                    <p class="text-xs font-bold text-gray-900 uppercase tracking-widest">Office of the Registrar</p>
+                    <p class="text-[10px] font-bold text-purple-600 italic mt-1">Schooli Academy Global</p>
+                </div>
+                <div class="no-print">
+                    <button onclick="window.print()" class="flex items-center gap-2 bg-gray-900 text-white px-8 py-3.5 rounded-xl font-bold shadow-xl shadow-gray-200 hover:bg-black hover:-translate-y-1 transition-all duration-300">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        Print Transcript
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

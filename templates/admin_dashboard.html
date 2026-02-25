@@ -1,104 +1,181 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-10">
+<div class="space-y-8">
     <!-- Header -->
-    <header class="flex justify-between items-center mb-10">
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Admin Command Center</h1>
-            <p class="text-gray-500 mt-1">Manage users, courses, and school operations</p>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-500 mt-1">Welcome back, here's what's happening today.</p>
         </div>
-        <div class="flex items-center gap-4">
-            <a href="/admin/teacher_attendance" class="bg-indigo-50 text-indigo-700 px-4 py-3 rounded-2xl font-bold hover:bg-indigo-100 transition">
-                Staff Attendance
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="/admin/backup" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-all text-sm shadow-sm">
+                <i data-lucide="download" class="w-4 h-4 text-purple-600"></i>
+                Backup
             </a>
-            <a href="/admin/backup" class="bg-amber-50 text-amber-700 px-4 py-3 rounded-2xl font-bold hover:bg-amber-100 transition">
-                Export Backup
-            </a>
-            <button onclick="document.getElementById('notice-modal').classList.remove('hidden')" class="bg-accent text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
+            <button onclick="document.getElementById('notice-modal').classList.remove('hidden')" class="flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2.5 rounded-xl font-bold hover:bg-purple-200 transition-all text-sm shadow-sm ring-1 ring-purple-200">
+                <i data-lucide="megaphone" class="w-4 h-4"></i>
                 Post Notice
             </button>
-            <button onclick="document.getElementById('event-modal').classList.remove('hidden')" class="bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
+            <button onclick="document.getElementById('event-modal').classList.remove('hidden')" class="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-purple-100 hover:bg-purple-700 hover:-translate-y-1 transition-all text-sm">
+                <i data-lucide="plus" class="w-4 h-4"></i>
                 Add Event
             </button>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <!-- Quick Actions & Forms -->
-        <div class="lg:col-span-2 space-y-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <!-- User Form -->
-                <section class="bg-white p-8 rounded-3xl shadow-card">
-                    <h3 class="text-xl font-bold mb-6">Register User</h3>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% set total_students = users | selectattr('role', 'equalto', 'student') | list | length %}
+        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-purple-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <span class="flex items-center gap-1 text-green-500 text-xs font-bold bg-green-50 px-2 py-1 rounded-lg">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                    +12%
+                </span>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Total Students</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-1">{{ total_students }}</h3>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-purple-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                    <i data-lucide="user-cog" class="w-6 h-6"></i>
+                </div>
+                <span class="flex items-center gap-1 text-blue-500 text-xs font-bold bg-blue-50 px-2 py-1 rounded-lg">
+                    <i data-lucide="minus" class="w-3 h-3"></i>
+                    Stable
+                </span>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Total Teachers</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-1">{{ teachers | length }}</h3>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-purple-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                    <i data-lucide="trophy" class="w-6 h-6"></i>
+                </div>
+                <span class="flex items-center gap-1 text-amber-500 text-xs font-bold bg-amber-50 px-2 py-1 rounded-lg">
+                    <i data-lucide="star" class="w-3 h-3"></i>
+                    4 New
+                </span>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Awards</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-1">24</h3>
+        </div>
+    </div>
+
+    <!-- Main Content Sections -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Forms & Growth -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Register User Form -->
+                <section class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i data-lucide="user-plus" class="w-5 h-5 text-purple-600"></i>
+                        <h3 class="text-xl font-bold">Register User</h3>
+                    </div>
                     <form action="/add_user" method="POST" class="space-y-4">
-                        <input type="text" name="name" placeholder="Full Name" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-                        <input type="email" name="email" placeholder="Email" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-                        <input type="password" name="password" placeholder="Password" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-                        <select id="role-select" name="role" onchange="toggleParentLink(this.value)" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary text-gray-500">
+                        <input type="text" name="name" placeholder="Full Name" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+                        <input type="email" name="email" placeholder="Email Address" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+                        <input type="password" name="password" placeholder="Set Password" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+                        <select name="role" id="role-select" onchange="toggleParentLink(this.value)" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm text-gray-600 cursor-pointer">
                             <option value="student">Student</option>
                             <option value="teacher">Teacher</option>
                             <option value="parent">Parent</option>
                         </select>
-                        
                         <div id="parent-link-div" class="space-y-2">
-                            <label class="block text-xs font-bold text-gray-400 uppercase">Link Parent (For Students)</label>
-                            <select name="parent_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary text-gray-500">
-                                <option value="">No Parent Linked</option>
+                            <select name="parent_id" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm text-gray-600 cursor-pointer">
+                                <option value="">Link Parent (Optional)</option>
                                 {% for parent in parents %}
                                 <option value="{{ parent.id }}">{{ parent.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-
-                        <script>
-                            function toggleParentLink(role) {
-                                const div = document.getElementById('parent-link-div');
-                                if (role === 'student') div.classList.remove('hidden');
-                                else div.classList.add('hidden');
-                            }
-                        </script>
-                        <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-bold hover:shadow-lg transition">Create Account</button>
+                        <button type="submit" class="w-full bg-purple-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 hover:-translate-y-0.5 transition-all">Create Account</button>
                     </form>
                 </section>
 
-                <!-- Course Form -->
-                <section class="bg-white p-8 rounded-3xl shadow-card">
-                    <h3 class="text-xl font-bold mb-6">New Course</h3>
+                <!-- New Course Form -->
+                <section class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i data-lucide="book-plus" class="w-5 h-5 text-blue-600"></i>
+                        <h3 class="text-xl font-bold">New Course</h3>
+                    </div>
                     <form action="/add_course" method="POST" class="space-y-4">
-                        <input type="text" name="title" placeholder="Course Title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-                        <textarea name="description" placeholder="Short Description" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-24" required></textarea>
-                        <select name="teacher_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary text-gray-500">
+                        <input type="text" name="title" placeholder="Course Title (e.g. Mathematics)" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+                        <textarea name="description" placeholder="Short course description..." class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm h-24" required></textarea>
+                        <select name="teacher_id" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm text-gray-600 cursor-pointer">
                             <option value="">Assign Teacher</option>
                             {% for teacher in teachers %}
                             <option value="{{ teacher.id }}">{{ teacher.name }}</option>
                             {% endfor %}
                         </select>
-                        <button type="submit" class="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:shadow-lg transition">Add Course</button>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-50 hover:bg-blue-700 hover:-translate-y-0.5 transition-all">Add Course</button>
                     </form>
                 </section>
             </div>
 
-            <!-- Stats Chart (Placeholder for now) -->
-            </div>
+            <!-- Enrollment Growth -->
+            <section class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 text-purple-600"></i>
+                        <h3 class="text-xl font-bold">Enrollment Analytics</h3>
+                    </div>
+                    <select class="text-sm border-none bg-gray-50 rounded-lg px-3 py-1 font-medium outline-none">
+                        <option>Last 4 Weeks</option>
+                        <option>Last 3 Months</option>
+                    </select>
+                </div>
+                <div class="h-64">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </section>
 
             <!-- Management Tables -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- User List -->
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                    <h3 class="text-xl font-bold mb-6">User Accounts</h3>
-                    <div class="overflow-y-auto max-h-96 pr-2 custom-scrollbar">
-                        <table class="w-full text-left">
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-800">Recent Users</h3>
+                        <a href="#" class="text-xs font-bold text-purple-600 hover:underline">View All</a>
+                    </div>
+                    <div class="overflow-y-auto max-h-80 custom-scrollbar">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 text-[10px] uppercase font-bold text-gray-400">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">User</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-gray-50">
                                 {% for u in users %}
-                                <tr class="group hover:bg-gray-50 transition">
-                                    <td class="py-4">
-                                        <p class="font-bold text-gray-800 leading-none">{{ u.name }}</p>
-                                        <p class="text-[9px] uppercase font-black text-gray-400 mt-1">{{ u.role }}</p>
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <img src="https://ui-avatars.com/api/?name={{ u.name }}&background=f3f4f6&color=6b7280" class="w-8 h-8 rounded-lg">
+                                            <div>
+                                                <p class="text-sm font-bold text-gray-800">{{ u.name }}</p>
+                                                <p class="text-[10px] uppercase font-bold text-purple-500">{{ u.role }}</p>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="py-4 text-right space-x-3">
-                                        <button onclick="openEditUser('{{ u.id }}', '{{ u.name }}', '{{ u.email }}', '{{ u.role }}')" class="text-indigo-400 hover:text-indigo-600 transition font-bold text-[10px] uppercase">Edit</button>
-                                        <a href="/admin/delete_user/{{ u.id }}" class="text-red-400 hover:text-red-600 transition font-bold text-[10px] uppercase" onclick="return confirm('Delete user?')">Remove</a>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onclick="openEditUser('{{ u.id }}', '{{ u.name }}', '{{ u.email }}', '{{ u.role }}')" class="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                            </button>
+                                            <a href="/admin/delete_user/{{ u.id }}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors" onclick="return confirm('Remove user?')">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -108,20 +185,37 @@
                 </div>
 
                 <!-- Course List -->
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                    <h3 class="text-xl font-bold mb-6">Active Courses</h3>
-                    <div class="overflow-y-auto max-h-96 pr-2 custom-scrollbar">
-                        <table class="w-full text-left">
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-800">Active Courses</h3>
+                        <a href="#" class="text-xs font-bold text-purple-600 hover:underline">View All</a>
+                    </div>
+                    <div class="overflow-y-auto max-h-80 custom-scrollbar">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 text-[10px] uppercase font-bold text-gray-400">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Course</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-gray-50">
                                 {% for c in courses %}
-                                <tr class="group hover:bg-gray-50 transition">
-                                    <td class="py-4">
-                                        <p class="font-bold text-gray-800 leading-none">{{ c.title }}</p>
-                                        <p class="text-[9px] uppercase font-black text-gray-400 mt-1">{{ c.teacher_ref.name if c.teacher_id else "Unassigned" }}</p>
+                                <tr class="hover:bg-gray-50 transition-colors group">
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-800">{{ c.title }}</p>
+                                            <p class="text-[10px] uppercase font-bold text-gray-400">{{ c.teacher_ref.name if c.teacher_id else "Unassigned" }}</p>
+                                        </div>
                                     </td>
-                                    <td class="py-4 text-right space-x-3">
-                                        <button onclick="openEditCourse('{{ c.id }}', '{{ c.title }}', '{{ c.description }}')" class="text-indigo-400 hover:text-indigo-600 transition font-bold text-[10px] uppercase">Edit</button>
-                                        <a href="/admin/delete_course/{{ c.id }}" class="text-red-400 hover:text-red-600 transition font-bold text-[10px] uppercase" onclick="return confirm('Delete course?')">Remove</a>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onclick="openEditCourse('{{ c.id }}', '{{ c.title }}', '{{ c.description }}')" class="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                            </button>
+                                            <a href="/admin/delete_course/{{ c.id }}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors" onclick="return confirm('Delete course?')">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -132,97 +226,173 @@
             </div>
         </div>
 
-        <!-- Right Sidebar (Logs & Activity) -->
-        <div class="space-y-10">
-            <div class="bg-white p-8 rounded-3xl shadow-card">
-                <h3 class="text-xl font-bold mb-6">Audit Logs</h3>
-                <div class="space-y-6">
-                    {% for log in logs %}
-                    <div class="flex gap-4">
-                        <div class="w-2 h-2 mt-2 rounded-full bg-primary shadow-[0_0_10px_#6366f1]"></div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">{{ log.action }}</p>
-                            <p class="text-[10px] uppercase font-bold text-gray-400 mt-1">{{ log.user_ref.name }} • {{ log.timestamp.strftime('%H:%M %p') }}</p>
-                        </div>
+        <!-- Sidebar (Logs & Calendar) -->
+        <div class="space-y-8">
+            <!-- Calendar Section -->
+            <section class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="calendar" class="w-5 h-5 text-purple-600"></i>
+                        <h3 class="font-bold text-gray-800">School Calendar</h3>
                     </div>
-                    {% else %}
-                    <p class="text-gray-400 text-sm text-center py-10">No recent activity</p>
-                    {% endfor %}
                 </div>
-            </div>
-
-            <!-- School Events -->
-            <div class="bg-white p-8 rounded-3xl shadow-card mt-10">
-                <h3 class="text-xl font-bold mb-6">School Calendar</h3>
-                <div class="space-y-6">
+                <div class="space-y-4">
                     {% for event in events %}
-                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl">
-                        <div class="w-12 h-12 bg-white rounded-xl flex flex-col items-center justify-center shadow-sm">
-                            <span class="text-[10px] uppercase font-bold text-primary">{{ event.date.strftime('%b') }}</span>
-                            <span class="font-bold text-gray-900">{{ event.date.strftime('%d') }}</span>
+                    <div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors group">
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex flex-col items-center justify-center border border-purple-100">
+                            <span class="text-[10px] uppercase font-black text-purple-600 leading-none">{{ event.date.strftime('%b') }}</span>
+                            <span class="text-lg font-bold text-gray-900 leading-none mt-0.5">{{ event.date.strftime('%d') }}</span>
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-800">{{ event.title }}</p>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">{{ event.type }}</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ event.title }}</p>
+                            <span class="text-[10px] uppercase font-bold text-gray-400">{{ event.type }}</span>
                         </div>
-                        <a href="/admin/delete_event/{{ event.id }}" class="ml-auto text-red-300 hover:text-red-500 transition" onclick="return confirm('Delete event?')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        <a href="/admin/delete_event/{{ event.id }}" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all" onclick="return confirm('Remove event?')">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i>
                         </a>
                     </div>
                     {% else %}
-                    <p class="text-gray-400 text-sm text-center py-6">No upcoming events</p>
+                    <div class="text-center py-10">
+                        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="calendar-off" class="w-6 h-6 text-gray-300"></i>
+                        </div>
+                        <p class="text-xs text-gray-400 font-medium">No upcoming events</p>
+                    </div>
                     {% endfor %}
                 </div>
-            </div>
+            </section>
+
+            <!-- Activity Logs -->
+            <section class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full -mr-12 -mt-12 opacity-50"></div>
+                <div class="flex items-center gap-3 mb-6 relative">
+                    <i data-lucide="activity" class="w-5 h-5 text-purple-600"></i>
+                    <h3 class="font-bold text-gray-800">Audit Logs</h3>
+                </div>
+                <div class="space-y-6 relative">
+                    {% for log in logs %}
+                    <div class="flex gap-4 group">
+                        <div class="relative">
+                            <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 group-hover:border-purple-200 transition-colors">
+                                <i data-lucide="user" class="w-4 h-4 text-gray-400"></i>
+                            </div>
+                            {% if not loop.last %}
+                            <div class="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gray-100"></div>
+                            {% endif %}
+                        </div>
+                        <div class="pb-2">
+                            <p class="text-sm font-medium text-gray-800 leading-tight">{{ log.action }}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] font-bold text-purple-600 uppercase">{{ log.user_ref.name }}</span>
+                                <span class="text-[10px] text-gray-400">•</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">{{ log.timestamp.strftime('%H:%M %p') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
         </div>
     </div>
 </div>
 
+<!-- Modals -->
 <!-- Notice Modal -->
-<div id="notice-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl">
-        <h3 class="text-2xl font-bold mb-6">Post New Announcement</h3>
+<div id="notice-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl scale-in-center">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Post Announcement</h3>
+            <button onclick="document.getElementById('notice-modal').classList.add('hidden')" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <i data-lucide="x" class="w-5 h-5 text-gray-400"></i>
+            </button>
+        </div>
         <form action="/notices" method="POST" class="space-y-4">
-            <input type="text" name="title" placeholder="Notice Title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-accent" required>
-            <textarea name="content" placeholder="Type announcement details here..." class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-accent h-32" required></textarea>
-            <select name="target" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-accent">
+            <input type="text" name="title" placeholder="Notice Title" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+            <textarea name="content" placeholder="Type announcement details here..." class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm h-32" required></textarea>
+            <select name="target" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm text-gray-600">
                 <option value="all">Everyone</option>
                 <option value="student">Students Only</option>
                 <option value="teacher">Teachers Only</option>
             </select>
             <div class="flex gap-4 pt-4">
-                <button type="button" onclick="document.getElementById('notice-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold transition">Cancel</button>
-                <button type="submit" class="flex-1 bg-accent text-white py-4 rounded-2xl font-bold shadow-lg transition">Post Notice</button>
+                <button type="button" onclick="document.getElementById('notice-modal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-600 py-3.5 rounded-xl font-bold transition-all text-sm">Cancel</button>
+                <button type="submit" class="flex-1 bg-purple-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 transition-all text-sm">Post Notice</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Event Modal -->
-<div id="event-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
-        <h3 class="text-2xl font-black mb-8">Schedule School Event</h3>
+<div id="event-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl scale-in-center">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Schedule Event</h3>
+            <button onclick="document.getElementById('event-modal').classList.add('hidden')" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <i data-lucide="x" class="w-5 h-5 text-gray-400"></i>
+            </button>
+        </div>
         <form action="/admin/events" method="POST" class="space-y-4">
-            <input type="text" name="title" placeholder="Event Title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-            <textarea name="description" placeholder="Description (Optional)" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-24"></textarea>
+            <input type="text" name="title" placeholder="Event Title" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+            <textarea name="description" placeholder="Short Description (Optional)" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm h-24"></textarea>
             <div class="grid grid-cols-2 gap-4">
-                <input type="date" name="date" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-                <select name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary">
-                    <option value="Event">Event</option>
-                    <option value="Holiday">Holiday</option>
+                <input type="date" name="date" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+                <select name="type" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm text-gray-600">
+                    <option value="Event">General Event</option>
+                    <option value="Holiday">School Holiday</option>
                     <option value="Exam">Exam Period</option>
                 </select>
             </div>
             <div class="flex gap-4 pt-4">
-                <button type="button" onclick="document.getElementById('event-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold transition">Cancel</button>
-                <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold shadow-lg transition">Schedule</button>
+                <button type="button" onclick="document.getElementById('event-modal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-600 py-3.5 rounded-xl font-bold transition-all text-sm">Cancel</button>
+                <button type="submit" class="flex-1 bg-purple-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 transition-all text-sm">Schedule Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="edit-user-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl scale-in-center">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Edit User Details</h3>
+        <form id="edit-user-form" action="" method="POST" class="space-y-4">
+            <input type="text" name="name" id="edit-user-name" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+            <input type="email" name="email" id="edit-user-email" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+            <select name="role" id="edit-user-role" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm">
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="parent">Parent</option>
+                <option value="admin">Admin</option>
+            </select>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-600 py-3.5 rounded-xl font-bold text-sm">Cancel</button>
+                <button type="submit" class="flex-1 bg-purple-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-purple-50 hover:bg-purple-700 transition-all text-sm">Update User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Course Modal -->
+<div id="edit-course-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl scale-in-center">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Modify Course</h3>
+        <form id="edit-course-form" action="" method="POST" class="space-y-4">
+            <input type="text" name="title" id="edit-course-title" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm" required>
+            <textarea name="description" id="edit-course-desc" class="w-full px-4 py-3 bg-gray-50 rounded-xl border border-transparent focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 outline-none transition-all text-sm h-32" required></textarea>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('edit-course-modal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-600 py-3.5 rounded-xl font-bold text-sm">Cancel</button>
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-50 hover:bg-blue-700 transition-all text-sm">Save Changes</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
+    // Stats Chart
     const ctx = document.getElementById('growthChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+    gradient.addColorStop(0, 'rgba(124, 58, 237, 0.1)');
+    gradient.addColorStop(1, 'rgba(124, 58, 237, 0)');
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -230,54 +400,48 @@
             datasets: [{
                 label: 'New Enrollments',
                 data: {{ growth_data|tojson }},
-                borderColor: '#6366f1',
+                borderColor: '#7c3aed',
+                borderWidth: 3,
                 tension: 0.4,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#7c3aed',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
                 fill: true,
-                backgroundColor: 'rgba(99, 102, 241, 0.1)'
+                backgroundColor: gradient
             }]
         },
         options: {
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#1f2937',
+                    padding: 12,
+                    titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                    bodyFont: { family: 'Outfit', size: 12 },
+                    cornerRadius: 8
+                }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    grid: { color: '#f3f4f6', drawBorder: false },
+                    ticks: { font: { family: 'Outfit' } }
+                }, 
+                x: { 
+                    grid: { display: false },
+                    ticks: { font: { family: 'Outfit' } }
+                } 
+            }
         }
     });
-</script>
-<!-- Edit Modals -->
-<div id="edit-user-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
-        <h3 class="text-2xl font-black mb-8">Edit User</h3>
-        <form id="edit-user-form" action="" method="POST" class="space-y-4">
-            <input type="text" name="name" id="edit-user-name" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-            <input type="email" name="email" id="edit-user-email" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-            <select name="role" id="edit-user-role" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary">
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-                <option value="parent">Parent</option>
-                <option value="admin">Admin</option>
-            </select>
-            <div class="flex gap-4 pt-4">
-                <button type="button" onclick="document.getElementById('edit-user-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold">Cancel</button>
-                <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold shadow-lg">Save</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<div id="edit-course-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
-        <h3 class="text-2xl font-black mb-8">Edit Course</h3>
-        <form id="edit-course-form" action="" method="POST" class="space-y-4">
-            <input type="text" name="title" id="edit-course-title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-            <textarea name="description" id="edit-course-desc" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary h-32" required></textarea>
-            <div class="flex gap-4 pt-4">
-                <button type="button" onclick="document.getElementById('edit-course-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold">Cancel</button>
-                <button type="submit" class="flex-1 bg-secondary text-white py-4 rounded-2xl font-bold shadow-lg">Update</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
+    // Modal Helpers
     function openEditUser(id, name, email, role) {
         document.getElementById('edit-user-form').action = '/admin/edit_user/' + id;
         document.getElementById('edit-user-name').value = name;
@@ -291,5 +455,23 @@
         document.getElementById('edit-course-desc').value = desc;
         document.getElementById('edit-course-modal').classList.remove('hidden');
     }
+    function toggleParentLink(role) {
+        const div = document.getElementById('parent-link-div');
+        if (role === 'student') div.classList.remove('hidden');
+        else div.classList.add('hidden');
+    }
+    
+    // Auto-refresh Lucide icons for dynamic content
+    lucide.createIcons();
 </script>
+
+<style>
+    @keyframes scale-in {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .scale-in-center {
+        animation: scale-in 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+</style>
 {% endblock %}

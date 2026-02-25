@@ -1,31 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-10">
-    <header class="flex justify-between items-center mb-10">
+<div class="space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Class Timetable</h1>
-            <p class="text-gray-500 mt-1">Schedule and manage classroom hours</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white leading-tight">Academic Scheduling</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Design the weekly routine and allocate classroom resources.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="flex items-center gap-2 bg-white dark:bg-dark-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm">
+                <i data-lucide="printer" class="w-4 h-4 text-purple-600"></i>
+                Export Master Schedule
+            </button>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <!-- Add Entry -->
-        <div class="bg-white p-8 rounded-3xl shadow-card">
-            <h3 class="text-xl font-bold mb-6">Schedule Class</h3>
-            <form action="/admin/timetable" method="POST" class="space-y-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Entry Panel -->
+        <div class="bg-white dark:bg-dark-800 rounded-[2.5rem] shadow-sm p-8 border border-gray-100 dark:border-gray-700 h-fit sticky top-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <i data-lucide="clock" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white italic">Reserve Slot</h3>
+            </div>
+
+            <form action="{{ url_for('manage_timetable') }}" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Course</label>
-                    <select name="course_id" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none" required>
-                        {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.title }}</option>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Target Course</label>
+                    <select name="course_id" required class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-blue-600 outline-none transition-all text-sm font-bold text-gray-700 dark:text-gray-200 cursor-pointer">
+                        {% for c in courses %}
+                        <option value="{{ c.id }}">{{ c.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Day</label>
-                        <select name="day" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Day</label>
+                        <select name="day" class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-blue-600 outline-none transition-all text-sm font-bold text-gray-700 dark:text-gray-200 cursor-pointer">
                             <option value="Monday">Monday</option>
                             <option value="Tuesday">Tuesday</option>
                             <option value="Wednesday">Wednesday</option>
@@ -34,51 +48,77 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Room</label>
-                        <input type="text" name="room" placeholder="A101" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Venue</label>
+                        <input type="text" name="room" placeholder="e.g. Lab 3" class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-blue-600 outline-none transition-all text-sm font-bold text-gray-700 dark:text-gray-200">
                     </div>
                 </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Start</label>
-                        <input type="time" name="start_time" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none" required>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Start</label>
+                        <input type="time" name="start_time" required class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-blue-600 outline-none transition-all text-sm font-black text-gray-700 dark:text-gray-200">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">End</label>
-                        <input type="time" name="end_time" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none" required>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">End</label>
+                        <input type="time" name="end_time" required class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-blue-600 outline-none transition-all text-sm font-black text-gray-700 dark:text-gray-200">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:shadow-lg transition duration-300">Set Schedule</button>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-50 dark:shadow-none hover:bg-blue-700 hover:-translate-y-1 transition-all">Synchronize Schedule</button>
             </form>
         </div>
 
-        <!-- Timetable View -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-card">
-            <h3 class="text-xl font-bold mb-6">Full Schedule</h3>
-            <div class="space-y-4">
-                {% for entry in timetable %}
-                <div class="flex items-center justify-between p-5 bg-gray-50 rounded-2xl hover:bg-indigo-50 transition border border-transparent hover:border-indigo-100">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 bg-white rounded-xl flex flex-col items-center justify-center shadow-sm">
-                            <span class="text-[10px] uppercase font-bold text-gray-400">{{ entry.day[:3] }}</span>
-                            <span class="font-bold text-primary">{{ entry.day[0] }}</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900">{{ entry.course_ref.title }}</h4>
-                            <p class="text-xs text-gray-400">Room: {{ entry.room }} • {{ entry.course_ref.teacher_ref.name if entry.course_ref.teacher_id else "Unassigned" }}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="block font-bold text-gray-800">{{ entry.start_time }} - {{ entry.end_time }}</span>
-                    </div>
+        <!-- Timetable Stream -->
+        <div class="lg:col-span-2 space-y-4 max-h-[850px] overflow-y-auto custom-scrollbar md:pr-4">
+            <div class="bg-white dark:bg-dark-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 sticky top-0 z-10 backdrop-blur-sm shadow-sm flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight italic">Weekly Routine</h3>
+                    <p class="text-[10px] text-gray-400 font-black uppercase mt-1 tracking-widest">Institutional calendar view</p>
                 </div>
-                {% else %}
-                <div class="text-center py-20 text-gray-400 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-100">
-                    No classes scheduled yet.
+                <div class="w-10 h-10 bg-gray-50 dark:bg-dark-900 rounded-xl flex items-center justify-center">
+                    <i data-lucide="layers" class="w-5 h-5 text-gray-400"></i>
                 </div>
-                {% endfor %}
             </div>
+
+            {% for entry in timetable %}
+            <div class="bg-white dark:bg-dark-800 p-8 rounded-[2rem] border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-900 transition-all flex flex-col md:flex-row gap-8 group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                
+                <div class="flex-shrink-0">
+                    <div class="w-16 h-16 bg-blue-600 rounded-3xl flex flex-col items-center justify-center text-white shadow-xl shadow-blue-100 dark:shadow-none transition-transform group-hover:rotate-6">
+                        <span class="text-[10px] font-black uppercase opacity-60 leading-none mb-1">{{ entry.day[:3] }}</span>
+                        <span class="text-2xl font-black leading-none">{{ entry.day[0] }}</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-w-0 z-10">
+                    <div class="flex items-center justify-between mb-2 pr-4">
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white truncate group-hover:text-blue-600 transition-colors">{{ entry.course_ref.title }}</h4>
+                        <span class="text-xs font-black text-blue-600 dark:text-blue-400 group-hover:underline">{{ entry.start_time }} - {{ entry.end_time }}</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 mt-6">
+                        <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-dark-900 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400"></i>
+                            <span class="text-xs font-bold text-gray-600 dark:text-gray-300 italic">Room {{ entry.room }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-dark-900 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-gray-400"></i>
+                            <span class="text-xs font-bold text-gray-600 dark:text-gray-300 italic">{{ entry.course_ref.teacher_ref.name if entry.course_ref.teacher_id else "Unassigned Staff" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="py-32 text-center bg-gray-50 dark:bg-dark-900/50 rounded-[3rem] border-2 border-dashed border-gray-100 dark:border-gray-700">
+                <div class="w-20 h-20 bg-white dark:bg-dark-800 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                    <i data-lucide="calendar-off" class="w-10 h-10 text-gray-200 dark:text-gray-800"></i>
+                </div>
+                <p class="text-gray-400 font-bold italic">Schedule is currently unpopulated.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
+<script>lucide.createIcons();</script>
 {% endblock %}

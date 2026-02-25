@@ -1,94 +1,248 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Management | V2</title>
+    <title>Schooli | Modern School SaaS</title>
+    <!-- Tailwind CSS with Dark Mode -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { inter: ['Inter', 'sans-serif'] },
-                    colors: { primary: '#6366f1', secondary: '#8b5cf6', accent: '#f43f5e' },
-                    boxShadow: { card: '0 10px 25px rgba(0,0,0,0.05)', cardHover: '0 20px 40px rgba(0,0,0,0.08)' }
+                    fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        purple: { 50: '#f5f3ff', 100: '#ede9fe', 600: '#7c3aed', 700: '#6d28d9' },
+                        dark: { 800: '#1e1e2d', 900: '#151521' }
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
-        .nav-link { 
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .nav-link.active { 
-            background: #6366f1;
-            color: white;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-        }
-        .nav-link:not(.active) { 
-            color: #6b7280;
-        }
-        .nav-link:not(.active):hover {
-            background: #f3f4f6;
-            color: #111827;
-        }
+        body { font-family: 'Outfit', sans-serif; transition: background-color 0.3s ease; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+        .sidebar-item-active { background-color: #ede9fe; color: #7c3aed; }
+        .dark .sidebar-item-active { background-color: #2d2d44; color: #a78bfa; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; }
     </style>
 </head>
-<body>
-    <div class="flex h-screen">
+<body class="bg-gray-50 dark:bg-dark-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="flex overflow-x-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r border-gray-100 p-6 flex flex-col justify-between">
-            <div>
-                <div class="flex items-center gap-3 mb-10 px-2">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl">S</div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">CampusPro</span>
+        <aside id="sidebar" class="fixed left-0 top-0 w-64 h-screen bg-white dark:bg-dark-800 shadow-xl flex flex-col justify-between z-50 transition-all duration-300 md:translate-x-0 -translate-x-full">
+            <div class="overflow-y-auto custom-scrollbar flex-1">
+                <!-- Logo & Close (Mobile) -->
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-200">
+                            <i data-lucide="graduation-cap" class="w-6 h-6 rotate-[-10deg]"></i>
+                        </div>
+                        <span class="text-2xl font-bold tracking-tight text-gray-800 dark:text-white">Schooli</span>
+                    </div>
+                    <button onclick="toggleSidebar()" class="md:hidden p-2 text-gray-400"><i data-lucide="x"></i></button>
                 </div>
-                
-                <nav class="space-y-2">
-                    {% if session.get('role') == 'admin' %}
-                        <a href="/admin" class="nav-link">Dashboard</a>
-                        <a href="/admin/fees" class="nav-link">Financials</a>
-                        <a href="/admin/timetable" class="nav-link">Timetable</a>
-                    {% elif session.get('role') == 'teacher' %}
-                        <a href="/teacher" class="nav-link">My Classes</a>
-                    {% elif session.get('role') == 'parent' %}
-                        <a href="/parent" class="nav-link">My Children</a>
-                    {% else %}
-                        <a href="/" class="nav-link">Learning</a>
+
+                <!-- Navigation -->
+                <nav class="px-4 space-y-1.5 mt-4">
+                    {% set role = session.get('role') %}
+                    {% set is_pro = session.get('is_pro') %}
+                    {% set dashboard_url = url_for('admin') if role == 'admin' else url_for('teacher_dashboard') if role == 'teacher' else url_for('parent_dashboard') if role == 'parent' else url_for('dashboard') %}
+                    
+                    <a href="{{ dashboard_url }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if request.path in ['/admin', '/teacher', '/parent', '/'] %}sidebar-item-active{% endif %}">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 opacity-60 group-hover:opacity-100"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+
+                    {% if role == 'admin' %}
+                    <a href="{{ url_for('students.list_students') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'students' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="users" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Students</span>
+                    </a>
+                    <a href="{{ url_for('teachers.list_teachers') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'teachers' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="user-cog" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Faculty</span>
+                    </a>
+                    <a href="{{ url_for('classes.list_classes') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'classes' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="shapes" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Classes</span>
+                    </a>
+                    <a href="{{ url_for('subjects.list_subjects') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'subjects' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="book" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Subjects</span>
+                    </a>
+                    <a href="{{ url_for('manage_timetable') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'timetable' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="calendar" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Routine</span>
+                    </a>
+                    <a href="{{ url_for('manage_teacher_attendance') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'teacher_attendance' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="clipboard-check" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Attendance</span>
+                    </a>
+                    <a href="{{ url_for('manage_fees') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'fees' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="wallet" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Financials</span>
+                    </a>
                     {% endif %}
-                    <a href="/messages" class="nav-link">Messages</a>
+
+                    <a href="{{ url_for('messages') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if '/messages' in request.path %}sidebar-item-active{% endif %}">
+                        <i data-lucide="mail" class="w-5 h-5 opacity-60"></i>
+                        <span class="font-medium">Messaging</span>
+                    </a>
+
+                    <a href="{{ url_for('manage_exams') }}" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'exams' in request.path %}sidebar-item-active{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="file-check-2" class="w-5 h-5 opacity-60"></i>
+                            <span class="font-medium">Exams</span>
+                        </div>
+                        {% if not is_pro %}<i data-lucide="lock" class="w-3 h-3 text-gray-400"></i>{% endif %}
+                    </a>
+
+                    <a href="{{ url_for('attendance_automation') }}" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group {% if 'attendance_report' in request.path %}sidebar-item-active{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="sheet" class="w-5 h-5 opacity-60"></i>
+                            <span class="font-medium">Reports</span>
+                        </div>
+                        {% if not is_pro %}<i data-lucide="lock" class="w-3 h-3 text-gray-400"></i>{% endif %}
+                    </a>
+                    
+                    <a href="{{ url_for('pro_analytics') if is_pro else url_for('upgrade.upgrade_page') }}" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 opacity-60"></i>
+                            <span class="font-medium">Analytics</span>
+                        </div>
+                        {% if not is_pro %}<i data-lucide="lock" class="w-3 h-3 text-gray-400"></i>{% endif %}
+                    </a>
                 </nav>
             </div>
-            
-            <div class="pt-6 border-t border-gray-100">
-                <a href="/logout" class="flex items-center gap-3 py-3 px-4 rounded-xl text-red-500 hover:bg-red-50 transition font-medium">
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 space-y-4">
+                {% if not is_pro %}
+                <a href="{{ url_for('upgrade.upgrade_page') }}" class="block bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <p class="text-xs font-bold italic">Schooli Pro</p>
+                    <p class="text-[10px] opacity-80 mt-1">Unlock power features</p>
+                    <div class="mt-3 flex items-center gap-2 text-[10px] font-black uppercase">
+                        Upgrade <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                    </div>
+                </a>
+                {% endif %}
+                
+                <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all font-semibold group">
+                    <i data-lucide="log-out" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
                     <span>Logout</span>
                 </a>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-50">
-            {% block content %}{% endblock %}
-        </main>
+        <!-- Main Wrapper -->
+        <div class="flex-1 md:ml-64 min-h-screen flex flex-col relative">
+            <!-- Navbar -->
+            <header class="h-18 bg-white/80 dark:bg-dark-800/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-700/50 flex justify-between items-center px-4 md:px-8 sticky top-0 z-40">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="hidden md:flex relative group w-64 lg:w-96">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Quick search..." class="w-full bg-gray-100/50 dark:bg-gray-700/50 rounded-xl py-2 pl-11 pr-4 outline-none border border-transparent focus:bg-white dark:focus:bg-gray-700 focus:ring-4 focus:ring-purple-500/10 transition-all text-xs">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleDarkMode()" class="p-2.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all">
+                        <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
+
+                    <div class="h-6 w-px bg-gray-100 dark:bg-gray-700"></div>
+
+                    <div class="flex items-center gap-3 group relative cursor-pointer ml-2">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-xs font-bold text-gray-800 dark:text-white">{{ session.get('name', 'User') }}</p>
+                            <div class="flex items-center justify-end gap-1.5 mt-0.5">
+                                <span class="text-[9px] uppercase font-black text-purple-600 dark:text-purple-400 tracking-wider">
+                                    {{ role }}
+                                </span>
+                                {% if is_pro %}
+                                <span class="px-1.5 py-0.5 bg-purple-600 text-white text-[8px] font-black rounded italic">PRO</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <img src="https://ui-avatars.com/api/?name={{ session.get('name', 'User') }}&background=7c3aed&color=fff&bold=true" class="w-10 h-10 rounded-xl shadow-sm group-hover:ring-2 ring-purple-600 transition-all">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="p-6 md:p-10 flex-1">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="space-y-4 mb-8">
+                    {% for category, message in messages %}
+                    <div class="p-4 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300 {% if category == 'success' %}bg-green-50 text-green-700 dark:bg-green-900/10 dark:text-green-400{% elif category == 'danger' %}bg-red-50 text-red-700 dark:bg-red-900/10 dark:text-red-400{% else %}bg-purple-50 text-purple-700 dark:bg-purple-900/10 dark:text-purple-400{% endif %} border-l-4 {% if category == 'success' %}border-green-500{% elif category == 'danger' %}border-red-500{% else %}border-purple-500{% endif %}">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <i data-lucide="{% if category == 'success' %}check-circle{% elif category == 'danger' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5"></i>
+                            {{ message }}
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="opacity-50 hover:opacity-100 transition-opacity"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
     </div>
-    
+
     <script>
-        // Set active class based on URL
-        document.querySelectorAll('.nav-link').forEach(link => {
-            if (link.getAttribute('href') === window.location.pathname) {
-                link.classList.add('active');
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            lucide.createIcons();
+        }
+
+        // Initialize Theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Search highlight logic
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            if (item.getAttribute('href') === window.location.pathname) {
+                item.classList.add('sidebar-item-active');
             }
         });
+
+        // Reusable password toggle
+        window.togglePassword = function(id) {
+            const el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        lucide.createIcons();
     </script>
 </body>
 </html>

@@ -1,64 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-10">
+<div class="space-y-8">
     <!-- Header -->
-    <header class="flex justify-between items-center mb-10">
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Education Portal</h1>
-            <p class="text-gray-500 mt-1">Logged in as {{ user.name }} (Student)</p>
+            <h1 class="text-3xl font-bold text-gray-900">Student Portal</h1>
+            <p class="text-gray-500 mt-1">Hello, {{ user.name }}! Ready to learn something new today?</p>
         </div>
-        <div class="flex items-center gap-4">
-            <div class="relative">
-                <div class="bg-white p-3 rounded-full shadow-card cursor-pointer">🔔</div>
-                <div class="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-bold">{{ notices|length }}</div>
-            </div>
-            <img src="https://i.pravatar.cc/48?u={{ user.id }}" class="rounded-2xl shadow-md border-2 border-white">
+        <div class="flex items-center gap-3">
+            <a href="/report/result/{{ user.id }}" class="flex items-center gap-2 bg-purple-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-purple-100 hover:bg-purple-700 hover:-translate-y-1 transition-all text-sm">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                Print Transcript
+            </a>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <!-- Dashboard Main -->
-        <div class="lg:col-span-2 space-y-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
             <!-- Hero Card -->
-            <div class="bg-gradient-to-br from-primary via-indigo-600 to-secondary p-10 rounded-[3rem] text-white shadow-2xl flex items-center justify-between relative overflow-hidden group">
-                <div class="relative z-10">
-                    <span class="bg-white/20 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase backdrop-blur-md">V2 System Active</span>
-                    <h2 class="text-4xl font-black mt-6 leading-tight">Your Semester<br>At a Glance</h2>
-                    <p class="mt-4 opacity-80 max-w-xs font-medium">Continue your progress in {{ courses|length }} active courses.</p>
-                    <a href="/report/result/{{ user.id }}" target="_blank" class="inline-block mt-8 bg-white text-primary px-8 py-3 rounded-2xl font-black text-sm shadow-xl hover:-translate-y-1 transition duration-300">
-                        Print Transcript
-                    </a>
+            <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden group">
+                <div class="absolute -right-16 -top-16 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+                <div class="relative z-10 max-w-lg">
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase backdrop-blur-md">Academic Session 2025-26</span>
+                    <h2 class="text-4xl font-bold mt-6 leading-tight">Master Your Future<br>With Schooli.</h2>
+                    <p class="mt-4 text-purple-100 opacity-90 font-medium">You are currently enrolled in {{ courses|length }} courses. Keep up the great work!</p>
+                    <div class="mt-8 flex items-center gap-4">
+                        <div class="flex -space-x-3">
+                            <img src="https://i.pravatar.cc/100?u=1" class="w-10 h-10 rounded-full border-2 border-purple-500 shadow-sm">
+                            <img src="https://i.pravatar.cc/100?u=2" class="w-10 h-10 rounded-full border-2 border-purple-500 shadow-sm">
+                            <img src="https://i.pravatar.cc/100?u=3" class="w-10 h-10 rounded-full border-2 border-purple-500 shadow-sm">
+                        </div>
+                        <p class="text-xs font-bold text-purple-100">Joined by 1.2k+ students</p>
+                    </div>
                 </div>
-                <!-- Decorative Circle -->
-                <div class="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition duration-700"></div>
             </div>
 
-            <!-- Courses Section -->
+            <!-- My Courses -->
             <section>
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-2xl font-black text-gray-800">My Learning</h3>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">My Learning</h3>
+                    <a href="#" class="text-sm font-bold text-purple-600 hover:underline">View All</a>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-inter">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for course in courses %}
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-card hover:shadow-cardHover hover:-translate-y-1 transition duration-300">
-                        <div class="flex items-center gap-5 mb-6">
-                            <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-primary font-black text-xl shadow-inner">
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:border-purple-100 hover:shadow-md transition-all group">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 font-bold text-lg group-hover:bg-purple-600 group-hover:text-white transition-colors">
                                 {{ course.title[0] }}
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900">{{ course.title }}</h4>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-tighter">{{ course.teacher_ref.name if course.teacher_id else "Unassigned" }}</p>
+                                <h4 class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">{{ course.title }}</h4>
+                                <p class="text-[10px] uppercase font-bold text-gray-400 mt-0.5">{{ course.teacher_ref.name if course.teacher_id else "Unassigned" }}</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-500 leading-relaxed mb-8 line-clamp-2">{{ course.description }}</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-black text-primary bg-indigo-50 px-4 py-2 rounded-xl">View Materials</span>
+                        <p class="text-sm text-gray-500 line-clamp-2 mb-6 h-10">{{ course.description }}</p>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                <span class="text-xs font-bold text-gray-400 uppercase">Active</span>
+                            </div>
+                            <button class="text-xs font-bold text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg transition-colors">Course Materials</button>
                         </div>
                     </div>
                     {% else %}
-                    <div class="col-span-full py-20 bg-gray-100/50 rounded-[3rem] border-2 border-dashed border-gray-200 text-center">
-                        <p class="text-gray-400 font-bold">No active enrollments</p>
+                    <div class="col-span-full py-16 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl text-center">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="book-x" class="w-6 h-6 text-gray-300"></i>
+                        </div>
+                        <p class="text-gray-400 font-bold">No active enrollments found</p>
+                        <p class="text-xs text-gray-400 mt-1">Enroll in a course below to get started.</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -66,14 +78,22 @@
 
             <!-- Discovery Section -->
             <section>
-                <h3 class="text-2xl font-black text-gray-800 mb-8">Discover Courses</h3>
+                <div class="flex items-center gap-3 mb-6">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
+                    <h3 class="text-xl font-bold text-gray-800">Discover New Courses</h3>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {% for all_course in all_courses %}
                         {% if all_course not in courses %}
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-primary transition">
-                            <h4 class="font-bold text-gray-900 mb-2 truncate">{{ all_course.title }}</h4>
-                            <p class="text-xs text-gray-400 mb-6 line-clamp-2 h-8">{{ all_course.description }}</p>
-                            <a href="/enroll/{{ all_course.id }}" class="block w-full text-center py-3 bg-gray-50 text-primary font-bold rounded-2xl hover:bg-primary hover:text-white transition">Enroll</a>
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-2 truncate">{{ all_course.title }}</h4>
+                                <p class="text-xs text-gray-500 line-clamp-3 mb-4 h-12">{{ all_course.description }}</p>
+                            </div>
+                            <a href="/enroll/{{ all_course.id }}" class="flex items-center justify-center gap-2 w-full py-3 bg-gray-50 text-purple-600 font-bold rounded-xl hover:bg-purple-600 hover:text-white transition-all text-sm group">
+                                Enroll Now
+                                <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
                         </div>
                         {% endif %}
                     {% endfor %}
@@ -81,54 +101,82 @@
             </section>
         </div>
 
-        <!-- Right Side: Notices & Stats -->
-        <aside class="space-y-10">
-            <!-- Notice Board -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xl font-bold">News Board</h3>
-                    <span class="text-[10px] font-black text-primary bg-indigo-50 px-3 py-1 rounded-lg uppercase">Alerts</span>
+        <!-- Sidebar Content -->
+        <div class="space-y-8">
+            <!-- Attendance Summary -->
+            <section class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-16 h-16 bg-purple-50 rounded-full -mr-8 -mt-8"></div>
+                <h3 class="text-lg font-bold text-gray-900 mb-6">Attendance Activity</h3>
+                <div class="relative w-40 h-40 mx-auto">
+                    <canvas id="attendanceChart"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        {% if attendance_data[0] + attendance_data[1] > 0 %}
+                            {% set percentage = (attendance_data[0] / (attendance_data[0] + attendance_data[1]) * 100) | round | int %}
+                            <span class="text-3xl font-bold text-gray-900 leading-none">{{ percentage }}%</span>
+                            <span class="text-[10px] uppercase font-bold text-gray-400 mt-1">Present</span>
+                        {% else %}
+                            <span class="text-3xl font-bold text-gray-900 leading-none">-</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="space-y-8">
+                <div class="grid grid-cols-2 gap-4 mt-8">
+                    <div class="p-3 bg-purple-50 rounded-xl">
+                        <p class="text-[10px] uppercase font-bold text-purple-600">Present</p>
+                        <p class="text-lg font-bold text-gray-900 mt-1">{{ attendance_data[0] }}</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-xl">
+                        <p class="text-[10px] uppercase font-bold text-gray-400">Absent</p>
+                        <p class="text-lg font-bold text-gray-900 mt-1">{{ attendance_data[1] }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- News Board -->
+            <section class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="megaphone" class="w-5 h-5 text-purple-600"></i>
+                        <h3 class="font-bold text-gray-800 text-lg">News Board</h3>
+                    </div>
+                    <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg uppercase">Important</span>
+                </div>
+                <div class="space-y-6">
                     {% for notice in notices %}
-                    <div class="relative pl-6 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-accent before:rounded-full">
-                        <h4 class="font-bold text-gray-900 leading-tight mb-2">{{ notice.title }}</h4>
-                        <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ notice.content }}</p>
-                        <span class="text-[9px] font-bold text-gray-300 uppercase">{{ notice.date_posted.strftime('%d %b %Y') }}</span>
+                    <div class="group relative pl-4 border-l-2 border-purple-200 hover:border-purple-600 transition-colors">
+                        <h4 class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight mb-1">{{ notice.title }}</h4>
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-2">{{ notice.content }}</p>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{{ notice.date_posted.strftime('%d %b %Y') }}</span>
                     </div>
                     {% else %}
                     <p class="text-center text-gray-400 text-xs py-10">No recent updates</p>
                     {% endfor %}
                 </div>
-            </div>
+            </section>
 
-            <!-- School Events -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                <h3 class="text-xl font-bold mb-8">School Calendar</h3>
-                <div class="space-y-6">
+            <!-- Calendar Section -->
+            <section class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <i data-lucide="calendar" class="w-5 h-5 text-blue-600"></i>
+                    <h3 class="font-bold text-gray-800 text-lg">School Calendar</h3>
+                </div>
+                <div class="space-y-4">
                     {% for event in events %}
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex flex-col items-center justify-center shadow-inner">
-                            <span class="text-[9px] uppercase font-black text-primary">{{ event.date.strftime('%b') }}</span>
-                            <span class="text-sm font-black text-gray-900">{{ event.date.strftime('%d') }}</span>
+                    <div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex flex-col items-center justify-center border border-blue-100">
+                            <span class="text-[10px] uppercase font-black text-blue-600 leading-none">{{ event.date.strftime('%b') }}</span>
+                            <span class="text-lg font-bold text-gray-900 leading-none mt-0.5">{{ event.date.strftime('%d') }}</span>
                         </div>
                         <div>
-                            <h4 class="text-sm font-bold text-gray-900">{{ event.title }}</h4>
-                            <span class="text-[9px] font-black text-gray-300 uppercase">{{ event.type }}</span>
+                            <p class="text-sm font-bold text-gray-800 leading-tight">{{ event.title }}</p>
+                            <span class="text-[10px] uppercase font-bold text-gray-400">{{ event.type }}</span>
                         </div>
                     </div>
                     {% else %}
                     <p class="text-center text-gray-400 text-xs py-5">No upcoming events</p>
                     {% endfor %}
                 </div>
-            </div>
-
-            <!-- User Progress Chart -->
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-card">
-                <h3 class="text-xl font-bold mb-6">Attendance</h3>
-                <canvas id="attendanceChart"></canvas>
-            </div>
-        </aside>
+            </section>
+        </div>
     </div>
 </div>
 
@@ -140,14 +188,26 @@
             labels: ['Present', 'Absent'],
             datasets: [{
                 data: {{ attendance_data|tojson }},
-                backgroundColor: ['#6366f1', '#f1f5f9'],
+                backgroundColor: ['#7c3aed', '#f3f4f6'],
+                hoverBackgroundColor: ['#6d28d9', '#e5e7eb'],
                 borderWidth: 0,
-                cutout: '80%'
+                cutout: '85%'
             }]
         },
         options: {
-            plugins: { legend: { display: false } }
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { 
+                legend: { display: false },
+                tooltip: { enabled: false }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
         }
     });
+    
+    lucide.createIcons();
 </script>
 {% endblock %}

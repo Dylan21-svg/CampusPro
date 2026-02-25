@@ -1,79 +1,130 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-10">
-    <header class="flex justify-between items-center mb-10">
+<div class="space-y-8">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Financial Management</h1>
-            <p class="text-gray-500 mt-1">Manage school fees and collection tracking</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white leading-tight">Institutional Financials</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Configure academic fees and track institutional revenue streams.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:shadow-xl hover:-translate-y-1 transition-all">
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                Financial Audit
+            </button>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <!-- Fee Creation -->
-        <div class="bg-white p-8 rounded-3xl shadow-card">
-            <h3 class="text-xl font-bold mb-6">Create Fee Item</h3>
-            <form action="/admin/fees" method="POST" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
-                    <input type="text" name="title" placeholder="e.g. 2nd Semester Tuition" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none" required>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Entry Panel -->
+        <div class="bg-white dark:bg-dark-800 rounded-[2.5rem] shadow-sm p-8 border border-gray-100 dark:border-gray-700 h-fit sticky top-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-2xl flex items-center justify-center text-green-600 dark:text-green-400">
+                    <i data-lucide="plus-circle" class="w-6 h-6"></i>
                 </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white italic">Publish Fee</h3>
+            </div>
+
+            <form action="{{ url_for('manage_fees') }}" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Amount ($)</label>
-                    <input type="number" name="amount" placeholder="0.00" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none" required>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Fee Identifier</label>
+                    <input type="text" name="title" placeholder="e.g. 2nd Term Lab Fees" required class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-green-600 outline-none transition-all text-sm font-bold text-gray-700 dark:text-gray-200">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-                    <select name="type" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-primary outline-none">
-                        <option value="Tuition">Tuition</option>
-                        <option value="Laboratory">Laboratory</option>
-                        <option value="Library">Library</option>
-                        <option value="Registration">Registration</option>
-                    </select>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Amount ($)</label>
+                        <input type="number" name="amount" placeholder="0.00" required class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-green-600 outline-none transition-all text-sm font-black text-gray-700 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 ml-1 tracking-widest">Category</label>
+                        <select name="type" class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-green-600 outline-none transition-all text-sm font-bold text-gray-700 dark:text-gray-200 cursor-pointer">
+                            <option value="Tuition">Tuition</option>
+                            <option value="Laboratory">Lab</option>
+                            <option value="Library">Library</option>
+                            <option value="Transport">Bus</option>
+                        </select>
+                    </div>
                 </div>
-                <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-bold hover:shadow-lg transition duration-300">Publish Fee</button>
+
+                <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-green-50 dark:shadow-none hover:bg-green-700 hover:-translate-y-1 transition-all">List New Fee</button>
             </form>
         </div>
 
-        <!-- Fees Overview Table -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-card">
-            <h3 class="text-xl font-bold mb-6">Active Fees</h3>
+        <!-- Directory Table -->
+        <div class="lg:col-span-2 bg-white dark:bg-dark-800 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="p-8 border-b border-gray-50 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">Ledger Overview</h3>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-tighter mt-1 italic italic">Current institutional billing items</p>
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead>
-                            <th class="pb-4 text-right">Actions</th>
+                    <thead class="bg-gray-50/50 dark:bg-dark-900/50">
+                        <tr>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Billing Item</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Unit Cost</th>
+                            <th class="px-8 py-5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Manage</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
                         {% for fee in fees %}
-                        <tr class="group hover:bg-gray-50 transition duration-150">
-                            <td class="py-5 font-bold text-gray-800">{{ fee.title }}</td>
-                            <td class="py-5 text-gray-500 text-sm"><span class="bg-gray-100 px-3 py-1 rounded-lg">{{ fee.type }}</span></td>
-                            <td class="py-5 font-semibold text-primary">${{ "{:,.2f}".format(fee.amount) }}</td>
-                            <td class="py-5 text-right space-x-3">
-                                <button onclick="openEditFee('{{ fee.id }}', '{{ fee.title }}', '{{ fee.amount }}')" class="text-indigo-400 hover:text-indigo-600 font-bold text-xs uppercase">Edit</button>
-                                <a href="/admin/delete_fee/{{ fee.id }}" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase" onclick="return confirm('Delete fee?')">Remove</a>
+                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors group">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-gray-100 dark:bg-dark-900 rounded-xl flex items-center justify-center text-gray-400 dark:text-gray-600 font-black text-xs border border-gray-200 dark:border-gray-700">
+                                        {{ fee.type[0] }}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-900 dark:text-white group-hover:text-purple-600 transition-colors">{{ fee.title }}</p>
+                                        <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">{{ fee.type }} Item</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="text-base font-black text-purple-600 dark:text-purple-400">$ {{ "{:,.2f}".format(fee.amount) }}</span>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="openEditFee('{{ fee.id }}', '{{ fee.title }}', '{{ fee.amount }}')" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors">
+                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                    </button>
+                                    <a href="/admin/delete_fee/{{ fee.id }}" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors" onclick="return confirm('Archive this financial record?')">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+
+                {% if not fees %}
+                <div class="py-32 text-center">
+                    <div class="w-20 h-20 bg-gray-50 dark:bg-dark-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                        <i data-lucide="receipt" class="w-10 h-10 text-gray-200 dark:text-gray-800"></i>
+                    </div>
+                    <p class="text-gray-400 font-bold italic">No financial drafts found.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
-</div>
 
-<!-- Edit Fee Modal -->
-<div id="edit-fee-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl">
-        <h3 class="text-2xl font-black mb-8">Edit Fee Item</h3>
-        <form id="edit-fee-form" action="" method="POST" class="space-y-4">
-            <input type="text" name="title" id="edit-fee-title" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
-            <input type="number" name="amount" id="edit-fee-amount" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary" required>
+<!-- Edit Modal -->
+<div id="edit-fee-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+    <div class="bg-white dark:bg-dark-800 w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white italic mb-10">Refine Fee Ledger</h3>
+        <form id="edit-fee-form" action="" method="POST" class="space-y-6">
+            <input type="text" name="title" id="edit-fee-title" class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-purple-600 outline-none transition-all text-sm font-bold text-gray-900 dark:text-white" required>
+            <input type="number" name="amount" id="edit-fee-amount" class="w-full px-5 py-4 bg-gray-50 dark:bg-dark-900 border border-transparent dark:border-gray-700 rounded-2xl focus:bg-white dark:focus:bg-dark-800 focus:border-purple-600 outline-none transition-all text-sm font-black text-gray-900 dark:text-white" required>
             <div class="flex gap-4 pt-4">
-                <button type="button" onclick="document.getElementById('edit-fee-modal').classList.add('hidden')" class="flex-1 bg-gray-100 py-4 rounded-2xl font-bold">Cancel</button>
-                <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold shadow-lg">Save</button>
+                <button type="button" onclick="document.getElementById('edit-fee-modal').classList.add('hidden')" class="flex-1 bg-gray-100 dark:bg-dark-900 text-gray-600 dark:text-gray-400 py-4 rounded-2xl font-bold transition-all hover:bg-gray-200 dark:hover:bg-dark-700">Discard</button>
+                <button type="submit" class="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-50 dark:shadow-none hover:bg-purple-700 transition-all">Optimize</button>
             </div>
         </form>
     </div>
@@ -86,5 +137,6 @@
         document.getElementById('edit-fee-amount').value = amount;
         document.getElementById('edit-fee-modal').classList.remove('hidden');
     }
+    lucide.createIcons();
 </script>
 {% endblock %}

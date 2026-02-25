@@ -12,6 +12,11 @@ class User(db.Model):
     phone = db.Column(db.String(20))
     address = db.Column(db.String(200))
     parent_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # For student role
+    class_id = db.Column(db.Integer, db.ForeignKey('school_class.id'), nullable=True) # For student role
+    
+    # Pro Features
+    is_pro = db.Column(db.Boolean, default=False)
+    pro_expiry_on = db.Column(db.DateTime, nullable=True)
     
     # Relationships
     courses_taught = db.relationship('Course', backref='teacher_ref', lazy=True)
@@ -24,11 +29,20 @@ class User(db.Model):
     activity_logs = db.relationship('ActivityLog', backref='user_ref', lazy=True)
     children = db.relationship('User', backref=db.backref('parent_ref', remote_side=[id]), lazy=True)
 
+class SchoolClass(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(200))
+    # Relationships
+    courses = db.relationship('Course', backref='class_ref', lazy=True)
+    students = db.relationship('User', foreign_keys='User.class_id', lazy=True)
+
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.String(500))
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    class_id = db.Column(db.Integer, db.ForeignKey('school_class.id'), nullable=True)
     
     # Relationships
     enrollments = db.relationship('Enrollment', backref='course_ref', lazy=True)
@@ -55,6 +69,9 @@ class TeacherAttendance(db.Model):
     date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
     status = db.Column(db.String(20), nullable=False) # Present, Absent, Leave
 
+    # Relationships
+    teacher_ref = db.relationship('User', backref=db.backref('teacher_attendances', lazy=True))
+
 class Result(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -77,6 +94,17 @@ class Payment(db.Model):
     amount_paid = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="Paid") # Paid, Partial, Pending
+
+class ProTransaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    amount = db.Column(db.Float, default=100.0)
+    payment_method = db.Column(db.String(50)) # stripe, paypal, mo-mo, orange, bank
+    transaction_id = db.Column(db.String(100), unique=True)
+    status = db.Column(db.String(20), default="Pending") # Pending, Completed, Failed
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', backref='pro_transactions', lazy=True)
 
 class Timetable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
