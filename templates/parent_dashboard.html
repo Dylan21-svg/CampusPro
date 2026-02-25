@@ -86,7 +86,7 @@
                                 <a href="/report/receipt/{{ payment.id }}" target="_blank" class="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-50 shadow-sm hover:border-purple-200 transition-colors group">
                                     <span class="text-xs font-medium text-gray-600">Fee #{{ payment.id }}02</span>
                                     <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold text-gray-900">${{ payment.amount_paid }}</span>
+                                        <span class="text-xs font-bold text-gray-900">{{ format_price(payment.amount_paid) }}</span>
                                         <i data-lucide="download" class="w-3 h-3 text-gray-300 group-hover:text-purple-600"></i>
                                     </div>
                                 </a>
