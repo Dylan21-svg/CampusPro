@@ -159,6 +159,27 @@ def set_currency(code):
         flash(f"Currency switched to {code}", "info")
     return redirect(request.referrer or url_for("dashboard"))
 
+@app.route("/search")
+@login_required
+def global_search():
+    q = request.args.get("q", "").strip()
+    if not q:
+        return redirect(request.referrer or url_for("dashboard"))
+    
+    # Try searching students
+    student = User.query.filter_by(role="student").filter(User.name.like(f"%{q}%")).first()
+    if student:
+        return redirect(url_for("students.list_students", search=q))
+    
+    # Try searching teachers
+    teacher = User.query.filter_by(role="teacher").filter(User.name.like(f"%{q}%")).first()
+    if teacher:
+        return redirect(url_for("teachers.list_teachers", search=q))
+        
+    # Default to dashboard with flash
+    flash(f"No exact match for '{q}'. Showing related results.", "info")
+    return redirect(url_for("dashboard"))
+
 @app.context_processor
 def utility_processor():
     def format_price(amount):

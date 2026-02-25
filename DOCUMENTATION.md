@@ -1,6 +1,6 @@
-# Schooli Management System - Technical Documentation
+# CampusPro Management System - Technical Documentation
 
-Welcome to the **Schooli** documentation. This system is a modern, Flask-based school management platform designed for institutions requiring robust student/faculty tracking and enterprise-grade analytics.
+Welcome to the **CampusPro** documentation. This system is a modern, Flask-based school management platform designed for institutions requiring robust student/faculty tracking and enterprise-grade analytics.
 
 ## 1. System Overview
 The system is built using:
@@ -63,4 +63,4 @@ Gated features allowing admins to generate bulk reports for students and financi
 3. Upon success, the `is_pro` flag is set in the database, and the UI dynamically updates to show the Pro Badge.
 
 ---
-*Created with ❤️ by the Schooli Development Team.*
+*Created with ❤️ by the CampusPro Development Team.*

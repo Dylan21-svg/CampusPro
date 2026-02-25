@@ -1,10 +1,10 @@
-# Schooli | Modern School Management SaaS
+# CampusPro | Modern School Management SaaS
 
 [![Enterprise Ready](https://img.shields.io/badge/Tier-Pro_Enterprise-7c3aed?style=for-the-badge)](https://github.com/Dylan-svg/CampusPro)
 [![Python Flask](https://img.shields.io/badge/Backend-Flask_3.x-white?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Frontend-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
 
-**Schooli** is a high-performance school management platform featuring a premium SaaS dashboard aesthetic, role-based access control, and advanced institutional analytics.
+**CampusPro** is a high-performance school management platform featuring a premium SaaS dashboard aesthetic, role-based access control, and advanced institutional analytics.
 
 ## ✨ Key Features
 
