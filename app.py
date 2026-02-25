@@ -13,7 +13,7 @@ from blueprints.students import students_bp
 from blueprints.classes import classes_bp
 from blueprints.subjects import subjects_bp
 from blueprints.payments import payments_bp
-from utils.decorators import role_required, pro_required
+from utils.decorators import role_required, pro_required, login_required
 
 app = Flask(__name__)
 app.config.from_object(Config)
